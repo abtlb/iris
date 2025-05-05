@@ -1,11 +1,10 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
+import 'dart:math';
 import 'package:go_router/go_router.dart';
 import 'package:untitled3/core/util/app_route.dart';
 
-
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  const HomePage({Key? key}) : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -13,24 +12,22 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  late Animation<double> _animation;
 
-  final List<_FeatureButton> _buttons = [
-    _FeatureButton(icon: Icons.school, label: 'Learning', route: AppRoute.learningHome),
-    _FeatureButton(icon: Icons.chat, label: 'Chat', route: AppRoute.chatHome),
-    //_FeatureButton(icon: Icons.zoom_in, label: 'Magnify', route: AppRoute.magnify),
-   // _FeatureButton(icon: Icons.alarm, label: 'Alarm', route: AppRoute.alarm),
-    //_FeatureButton(icon: Icons.hearing, label: 'Sound', route: AppRoute.soundDetection),
+  final List<IconData> icons = [
+    Icons.school,          // Learning
+    Icons.chat,            // Chat
+    Icons.zoom_in,         // Magnify
+    Icons.alarm,           // Alarm
+    Icons.hearing,         // Sound Detection
   ];
 
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(
+      duration: const Duration(seconds: 5),
       vsync: this,
-      duration: const Duration(seconds: 3),
-    )..repeat(reverse: false);
-    _animation = CurvedAnimation(parent: _controller, curve: Curves.linear);
+    )..repeat();
   }
 
   @override
@@ -39,65 +36,87 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     super.dispose();
   }
 
-  Widget buildButton(double angle, _FeatureButton button, int index) {
-    final radius = 120.0;
-    final x = radius * cos(angle + _animation.value * 2 * pi);
-    final y = radius * sin(angle + _animation.value * 2 * pi);
-    return Positioned(
-      left: MediaQuery.of(context).size.width / 2 + x - 30,
-      top: MediaQuery.of(context).size.height / 2 + y - 30,
-      child: GestureDetector(
-        onTap: () => context.go(button.route),
-        child: CircleAvatar(
-          radius: 30,
-          backgroundColor: Colors.blueAccent,
-          child: Icon(button.icon, color: Colors.white),
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
+    double radius = 100;
+
     return Scaffold(
       body: Stack(
         children: [
-          // Background with opacity
           Opacity(
-            opacity: 0.15,
-            child: Image.asset(
-              'assets/wel.jpeg',
-              fit: BoxFit.cover,
-              height: double.infinity,
-              width: double.infinity,
+            opacity: 0.1,
+            child: Container(
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage('lib/assets/wel.jpeg'),
+                  fit: BoxFit.cover,
+                ),
+              ),
             ),
           ),
           Center(
-            child: Stack(
-              children: List.generate(_buttons.length, (index) {
-                double angle = (2 * pi / _buttons.length) * index;
-                return buildButton(angle, _buttons[index], index);
-              }),
+            child: AnimatedBuilder(
+              animation: _controller,
+              builder: (context, child) {
+                return Stack(
+                  children: List.generate(icons.length, (index) {
+                    final angle = (2 * pi / icons.length) * index + (_controller.value * 2 * pi);
+                    final offset = Offset(
+                      radius * cos(angle),
+                      radius * sin(angle),
+                    );
+                    return Positioned(
+                      left: MediaQuery.of(context).size.width / 2 + offset.dx - 25,
+                      top: MediaQuery.of(context).size.height / 2 + offset.dy - 25,
+                      child: CircleAvatar(
+                        radius: 25,
+                        backgroundColor: Colors.blueAccent,
+                        child: IconButton(
+                          icon: Icon(icons[index], color: Colors.white),
+                          onPressed: () {
+                            switch (index) {
+                              case 0:
+                                context.go(AppRoute.learningHome);
+                                break;
+                              case 1:
+                                context.go(AppRoute.chatHome);
+                                break;
+                              case 2:
+                                context.go(AppRoute.magnify);
+                                break;
+                              case 3:
+                                context.go(AppRoute.alarm);
+                                break;
+                              case 4:
+                                context.go(AppRoute.soundDetection);
+                                break;
+                            }
+                          },
+                        ),
+                      ),
+                    );
+                  }),
+                );
+              },
             ),
           ),
-          // Center logo
-          Center(
-            child: CircleAvatar(
-              radius: 40,
-              backgroundColor: Colors.blue[700],
-              child: const Icon(Icons.home, color: Colors.white, size: 30),
+          const Positioned(
+            bottom: 60,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: Text(
+                'Start',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blueAccent,
+                ),
+              ),
             ),
-          )
+          ),
         ],
       ),
     );
   }
-}
-
-class _FeatureButton {
-  final IconData icon;
-  final String label;
-  final String route;
-
-  _FeatureButton({required this.icon, required this.label, required this.route});
 }

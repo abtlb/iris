@@ -13,8 +13,7 @@ import 'package:untitled3/features/search/presentation/views/search_view.dart';
 import 'package:untitled3/features/video_chat/presentation/pages/VideoChatTest.dart';
 import 'package:untitled3/features/video_home/presentation/views/widgets/help_screen.dart';
 import 'package:untitled3/features/video_home/presentation/views/widgets/account_page.dart';
-
-import '../../features/video_home/presentation/views/widgets/TextMagnifierSpeakerScreen.dart'; // ✅ ADD THIS
+import 'package:untitled3/features/video_home/presentation/views/widgets/TextMagnifierSpeakerScreen.dart';
 
 abstract class AppRoute {
   static String welcomePath = '/';
@@ -32,6 +31,11 @@ abstract class AppRoute {
   static String learningHome = '/learningHome';
   static String learningStart = '/learningStart';
   static String soundDetection = '/soundDetection';
+
+  // ✅ نضيف هذه لوظائف الأزرار في home_page.dart:
+  static String chatHome = kChatPath;
+  static String magnify = magnifierPath;
+  static String alarm = helpPath;
 
   static final router = GoRouter(
     routes: [
@@ -63,24 +67,11 @@ abstract class AppRoute {
       GoRoute(path: accountPath, builder: (_, __) => const AccountPage()),
       GoRoute(path: learningHome, builder: (_, __) => const LearningHome()),
       GoRoute(path: learningStart, builder: (_, __) => const LearningStartScreen()),
-      GoRoute(
-        path: magnifierPath,
-        builder: (_, __) => const TextMagnifierSpeakerScreen(),
-      ),
-      GoRoute(
-        path: soundDetection,
-        builder: (_, __) => const SoundMonitorPage(),
-      ),
-
+      GoRoute(path: magnifierPath, builder: (_, __) => const TextMagnifierSpeakerScreen()),
+      GoRoute(path: soundDetection, builder: (_, __) => const SoundMonitorPage()),
     ],
   );
 }
-
-
-
-
-
-
 
 
 

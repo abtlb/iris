@@ -130,7 +130,7 @@ class _SignInScreenState extends State<SignInScreen> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text(languageProvider.translate('signInSuccess'))),
                     );
-                    context.go(AppRoute.homePath); // ✅ انتقال للصفحة الرئيسية
+                    context.go(AppRoute.homePath); // ✅ الانتقال إلى الصفحة الرئيسية بعد تسجيل الدخول الناجح
                   } else if (state is SignInFailure) {
                     _showError(languageProvider.translate('Wrong Username or Password'));
                   }

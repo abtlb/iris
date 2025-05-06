@@ -18,7 +18,7 @@ import 'package:untitled3/features/auth/presentation/pages/home_page .dart';
 
 abstract class AppRoute {
   static String welcomePath = '/';
-  static String homePath = '/home';
+  static String homePath = '/main'; // تعديل المسار لـ HomePage هنا
   static String kChatPath = '/chat';
   static String kSearchPath = '/search';
   static String signInPath = '/signin';
@@ -40,8 +40,10 @@ abstract class AppRoute {
 
   static final router = GoRouter(
     routes: [
-      GoRoute(path: welcomePath, builder: (_, __) =>  WelcomeScreen()),
-      GoRoute(path: homePath, builder: (_, __) => const HomePage()),
+      GoRoute(path: welcomePath, builder: (_, __) => WelcomeScreen()), // ممكن تبقي الصفحة الرئيسية
+
+      // تعديل المسار الخاص بـ HomePage
+      GoRoute(path: homePath, builder: (_, __) => const HomePage()),  // هنا نغير المسار لـ "/main" أو أي مسار آخر تحبيه
 
       // Chat route with extra
       GoRoute(
@@ -75,7 +77,7 @@ abstract class AppRoute {
       GoRoute(path: helpPath, builder: (_, __) => const HelpScreen()),
       GoRoute(path: accountPath, builder: (_, __) => const AccountPage()),
       GoRoute(path: learningHome, builder: (_, __) => const LearningHome()),
-      GoRoute(path: learningStart, builder: (_, __) => const LearningStartScreen()),  // هذا المسار تم تحديده للصفحة التي ترغب فيها
+      GoRoute(path: learningStart, builder: (_, __) => const LearningStartScreen()),
       GoRoute(path: magnifierPath, builder: (_, __) => const TextMagnifierSpeakerScreen()),
       GoRoute(path: soundDetection, builder: (_, __) => const SoundMonitorPage()),
     ],

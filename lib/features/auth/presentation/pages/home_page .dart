@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
 import 'package:go_router/go_router.dart';
-import 'package:untitled3/core/util/app_route.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -15,18 +14,18 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   late Animation<double> _animation;
 
   final List<Map<String, dynamic>> icons = [
-    {'icon': Icons.school, 'label': 'Learning', 'route': AppRoute.learningStart},
-    {'icon': Icons.chat, 'label': 'Chat', 'route': AppRoute.chatHome}, // Chat route
-    {'icon': Icons.zoom_in, 'label': 'Magnify', 'route': AppRoute.magnify},
-    {'icon': Icons.alarm, 'label': 'Alarm', 'route': AppRoute.alarm},
-    {'icon': Icons.hearing, 'label': 'Sound Detection', 'route': AppRoute.soundDetection},
+    {'icon': Icons.school, 'label': 'Learning', 'route': '/learningStart'}, // هذا المسار يشير إلى الصفحة التي تريدها
+    {'icon': Icons.chat, 'label': 'Chat', 'route': '/chat'},
+    {'icon': Icons.zoom_in, 'label': 'Magnify', 'route': '/magnify'},
+    {'icon': Icons.alarm, 'label': 'Alarm', 'route': '/alarm'},
+    {'icon': Icons.hearing, 'label': 'Sound Detection', 'route': '/sound-detection'},
   ];
 
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(seconds: 250), // أبطأ بكتير
+      duration: const Duration(seconds: 250),
       vsync: this,
     )..repeat();
     _animation = Tween<double>(begin: 0, end: 2 * pi).animate(_controller);
@@ -91,7 +90,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                   const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 30),
                     child: Text(
-                      "communication easier for everyone, you will find tools and ideas to support sign language and learning",
+                      "Communication easier for everyone. You will find tools and ideas to support sign language and learning.",
                       textAlign: TextAlign.center,
                       style: TextStyle(fontSize: 14, color: Colors.black54),
                     ),
@@ -99,7 +98,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 ],
               ),
 
-              // دواير في منتصف الشاشة
               AnimatedBuilder(
                 animation: _animation,
                 builder: (context, child) {
@@ -120,15 +118,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                         top: centerY + offset.dy - 45,
                         child: GestureDetector(
                           onTap: () {
-                            // Example: Passing senderId and receiverId on Chat click
-                            if (icons[index]['label'] == 'Chat') {
-                              context.go(
-                                AppRoute.kChatPath,
-                                extra: {'senderId': 'user123', 'receiverId': 'user456'},
-                              );
-                            } else {
-                              context.go(icons[index]['route']);
-                            }
+                            // هنا نتحقق إذا كانت الأيقونة هي "Learning" أو أي مسار آخر.
+                            context.go(icons[index]['route']); // التوجيه للمسار المحدد
                           },
                           child: Column(
                             mainAxisSize: MainAxisSize.min,

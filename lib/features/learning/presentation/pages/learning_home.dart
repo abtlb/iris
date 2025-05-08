@@ -4,9 +4,7 @@ import 'package:untitled3/core/constants/constants.dart';
 import 'package:untitled3/features/learning/presentation/pages/learning_start_screen.dart';
 import 'package:untitled3/features/learning/domain/entities/course.dart';
 import 'package:untitled3/features/learning/data/data_sources/course_local_data.dart';
-
-import 'course_detail_page.dart';
-
+import 'package:go_router/go_router.dart';
 
 class LearningHome extends StatefulWidget {
   const LearningHome({super.key});
@@ -39,15 +37,21 @@ class _LearningHomeState extends State<LearningHome> {
           children: [
             Row(
               children: [
-                const Icon(
-                  Icons.arrow_back_ios,
-                  color: BlueColor1 ,
-                  size: 30,
+                IconButton(
+                  icon: const Icon(
+                    Icons.arrow_back_ios,
+                    color: BlueColor1,
+                    size: 30,
+                  ),
+                  onPressed: () {
+                    // التنقل إلى صفحة البداية
+                    GoRouter.of(context).go('/learningStart');
+                  },
                 ),
                 const Spacer(),
                 const Icon(
                   Icons.search,
-                  color: BlueColor1 ,
+                  color: BlueColor1,
                   size: 30,
                 ),
               ],
@@ -85,11 +89,11 @@ class _LearningHomeState extends State<LearningHome> {
                   height: height * 0.12,
                   width: width * 0.25,
                   decoration: BoxDecoration(
-                    color: BlueColor1 ,
+                    color: BlueColor1,
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
-                        color: BlueColor1 .withOpacity(0.5),
+                        color: BlueColor1.withOpacity(0.5),
                         spreadRadius: 5,
                         blurRadius: 7,
                         offset: const Offset(0, 3),
@@ -146,11 +150,9 @@ class _LearningHomeState extends State<LearningHome> {
                   final course = selectedCategory[selectedIndex][index];
                   return GestureDetector(
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => CourseDetailPage(course: course),
-                        ),
+                      GoRouter.of(context).go(
+                        '/course_detail',
+                        extra: course,
                       );
                     },
                     child: Padding(
@@ -166,7 +168,7 @@ class _LearningHomeState extends State<LearningHome> {
                               color: course.bgcolor.withOpacity(0.5),
                               spreadRadius: 7,
                               blurRadius: 7,
-                              offset: Offset(0, 5),
+                              offset: const Offset(0, 5),
                             ),
                           ],
                         ),
@@ -179,7 +181,6 @@ class _LearningHomeState extends State<LearningHome> {
                               fontWeight: FontWeight.bold,
                               text: course.title,
                             ),
-
                             SizedBox(height: height * 0.02),
                             Center(
                               child: Container(
@@ -192,7 +193,6 @@ class _LearningHomeState extends State<LearningHome> {
                       ),
                     ),
                   );
-
                 },
               ),
             ),
@@ -250,3 +250,4 @@ class CustomButton extends StatelessWidget {
     );
   }
 }
+

@@ -17,6 +17,8 @@ import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
   await initializeDependancies();
   final GetIt locator = GetIt.instance;
   runApp(
@@ -57,7 +59,7 @@ Future<void> main() async {
   );
 
   tz.initializeTimeZones();
-  tz.setLocalLocation(tz.getLocation('Your/City'));
+  tz.setLocalLocation(tz.getLocation('Africa/Cairo'));
 }
 
 class MyApp extends StatelessWidget {

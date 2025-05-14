@@ -1,3 +1,7 @@
+import 'dart:ui';
+
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:untitled3/features/auth/presentation/pages/ForgotPasswordScreen.dart';
 import 'package:untitled3/features/auth/presentation/pages/sign_in_screen.dart';
@@ -13,7 +17,9 @@ import 'package:untitled3/features/search/presentation/views/search_view.dart';
 import 'package:untitled3/features/video_chat/presentation/pages/VideoChatTest.dart';
 import 'package:untitled3/features/video_home/presentation/views/widgets/help_screen.dart';
 import 'package:untitled3/features/video_home/presentation/views/widgets/account_page.dart';
+import 'package:untitled3/main.dart';
 
+import '../../features/alarm/domain/entities/alarm_entity.dart';
 import '../../features/alarm/presentation/pages/alarm_page.dart';
 import '../../features/alarm/presentation/pages/set_alarm_page.dart';
 import '../../features/video_home/presentation/views/widgets/TextMagnifierSpeakerScreen.dart';
@@ -37,7 +43,10 @@ abstract class AppRoute {
   static String alarmPath = '/alarm';
   static String setAlarmPath = '/set_alarm';
 
+  static final navigatorKey = GlobalKey<NavigatorState>();
+
   static final router = GoRouter(
+    navigatorKey: navigatorKey,
     routes: [
       GoRoute(path: welcomePath, builder: (_, __) => WelcomeScreen()),
       GoRoute(path: homePath, builder: (_, __) => const HomeView()),
@@ -79,7 +88,15 @@ abstract class AppRoute {
       GoRoute(path: accountPath, builder: (_, __) => const AccountPage()),
       GoRoute(path: magnifierPath, builder: (_, __) => const TextMagnifierSpeakerScreen()),
       GoRoute(path: alarmPath, builder: (_, __) => const AlarmPage()),
-      GoRoute(path: setAlarmPath, builder: (_, __) => const SetAlarmPage()), // Added route
+      GoRoute(
+        path: AppRoute.setAlarmPath,
+        builder: (context, state) {
+          final alarm = state.extra as Alarm?;
+          print('Alarm date before navigating: ${alarm?.time.toString()}');
+          return SetAlarmPage(alarm: alarm);
+        },
+      ),
+
     ],
   );
 }

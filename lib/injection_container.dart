@@ -4,7 +4,10 @@ import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:untitled3/core/storage/storage.dart';
 import 'package:untitled3/core/services/local_notification_ds.dart';
-import 'package:untitled3/features/alarm/data/datasources/alarm_notification_ds.dart';
+import 'package:untitled3/features/alarm/data/%20services/alarm_callback_service.dart';
+import 'package:untitled3/features/alarm/data/%20services/alarm_notification_ds.dart';
+import 'package:untitled3/features/alarm/data/%20services/flash_service.dart';
+import 'package:untitled3/features/alarm/data/%20services/vibration_service.dart';
 import 'package:untitled3/features/alarm/data/repositories/alarm_repository_impl.dart';
 import 'package:untitled3/features/alarm/domain/repositories/alarm_repository.dart';
 import 'package:untitled3/features/auth/data/data_sources/remote/ApiService.dart';
@@ -95,13 +98,16 @@ Future<void> initializeDependancies() async {
   sl.registerFactory<SoundMonitorCubit>(() => SoundMonitorCubit(startClassification: sl(), stopClassification: sl(), monitorNoise: sl()));
 
   //for the alarm feature
-  // Register SharedPreferences first
   sl.registerSingleton<LocalAlarmDataSource>(LocalAlarmDataSource());
-  sl.registerSingleton<AlarmNotificationService>(AlarmNotificationService(sl()));
+  sl.registerSingleton<AlarmCallbackService>(AlarmCallbackService());
+  final alarmNotificationService = AlarmNotificationService(sl());
+  alarmNotificationService.initialize();
+  sl.registerSingleton<AlarmNotificationService>(alarmNotificationService);
   sl.registerSingleton<AlarmRepository>(
     AlarmRepositoryImpl(
       notifications: sl(),
       localAlarmDataSource: sl(),
+      alarmCallbackService: sl(),
     ),
   );
   sl.registerFactory(() => AlarmListCubit(repository: sl()));

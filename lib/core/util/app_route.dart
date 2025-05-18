@@ -16,7 +16,7 @@ import 'package:untitled3/features/video_home/presentation/views/home_view.dart'
 import 'package:untitled3/features/search/presentation/views/search_view.dart';
 import 'package:untitled3/features/video_chat/presentation/pages/VideoChatTest.dart';
 import 'package:untitled3/features/video_home/presentation/views/widgets/help_screen.dart';
-import 'package:untitled3/features/video_home/presentation/views/widgets/account_page.dart';
+import 'package:untitled3/features/account/presentation/pages/account_page.dart';
 import 'package:untitled3/main.dart';
 
 import '../../features/alarm/domain/entities/alarm_entity.dart';
@@ -44,8 +44,10 @@ abstract class AppRoute {
   static String setAlarmPath = '/set_alarm';
 
   static final navigatorKey = GlobalKey<NavigatorState>();
+  static final RouteObserver<ModalRoute<void>> routeObserver = RouteObserver<ModalRoute<void>>();
 
   static final router = GoRouter(
+    observers: [routeObserver],
     navigatorKey: navigatorKey,
     routes: [
       GoRoute(path: welcomePath, builder: (_, __) => WelcomeScreen()),
@@ -73,7 +75,10 @@ abstract class AppRoute {
         },
       ),
       GoRoute(path: helpPath, builder: (_, __) => const HelpScreen()),
-      GoRoute(path: accountPath, builder: (_, __) => const AccountPage()),
+      GoRoute(path: accountPath, builder: (context, state) {
+        final extra = state.extra as Map<String, dynamic>;
+        return AccountPage(prevPath: extra['prevPath']);
+      }),
       GoRoute(path: learningHome, builder: (_, __) => const LearningHome()),
       GoRoute(path: learningStart, builder: (_, __) => const LearningStartScreen()),
       GoRoute(
@@ -85,7 +90,6 @@ abstract class AppRoute {
         builder: (_, __) => const SoundMonitorPage(),
       ),
 
-      GoRoute(path: accountPath, builder: (_, __) => const AccountPage()),
       GoRoute(path: magnifierPath, builder: (_, __) => const TextMagnifierSpeakerScreen()),
       GoRoute(path: alarmPath, builder: (_, __) => const AlarmPage()),
       GoRoute(

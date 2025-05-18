@@ -68,4 +68,29 @@ class UserRepositoryImpl implements UserRepository {
   Future<void> uploadPfp(File img, String username) async{
     await apiService.uploadAvatar(username, img);
   }
+
+  @override
+  Future<DataState<UserEntity>> getCurrentUser() async {
+    try
+    {
+      final httpResponse = await apiService.getCurrentUser();
+
+      if(httpResponse.response.statusCode == HttpStatus.ok){
+        return DataSuccess(httpResponse.data);
+      }
+      else
+      {
+        return DataFailed(DioException(
+            error: httpResponse.response.statusMessage,
+            response: httpResponse.response,
+            type: DioExceptionType.badResponse,
+            requestOptions: httpResponse.response.requestOptions
+
+        ));
+      }
+    }
+    on DioException catch(e){
+      return DataFailed(e);
+    }
+  }
 }

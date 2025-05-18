@@ -4,6 +4,10 @@ import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:untitled3/core/storage/storage.dart';
 import 'package:untitled3/core/services/local_notification_ds.dart';
+import 'package:untitled3/features/account/data/datasources/updateAccountService.dart';
+import 'package:untitled3/features/account/domain/repositories/update_account_repository.dart';
+import 'package:untitled3/features/account/domain/usecases/update_account.dart';
+import 'package:untitled3/features/account/domain/usecases/update_avatar.dart';
 import 'package:untitled3/features/alarm/data/%20services/alarm_callback_service.dart';
 import 'package:untitled3/features/alarm/data/%20services/alarm_notification_ds.dart';
 import 'package:untitled3/features/alarm/data/%20services/flash_service.dart';
@@ -15,6 +19,8 @@ import 'package:untitled3/features/auth/data/repository/auth_repository_impl.dar
 import 'package:untitled3/features/auth/data/repository/user_repository_impl.dart';
 import 'package:untitled3/features/auth/domain/repository/UserRepository.dart';
 import 'package:untitled3/features/auth/domain/repository/auth_repository.dart';
+import 'package:untitled3/features/auth/domain/usecases/get_current_user.dart';
+import 'package:untitled3/features/auth/domain/usecases/get_user.dart';
 import 'package:untitled3/features/auth/domain/usecases/get_users.dart';
 import 'package:untitled3/features/auth/domain/usecases/sign_in.dart';
 import 'package:untitled3/features/auth/presentation/bloc/auth/sign_in/sign_in_bloc.dart';
@@ -44,6 +50,8 @@ import 'package:untitled3/features/video_chat/domain/usecases/connectToVideoChat
 import 'package:untitled3/features/video_chat/domain/usecases/disconnectFromVideoChat.dart';
 import 'package:untitled3/features/video_chat/presentation/bloc/video_chat_bloc.dart';
 
+import 'features/account/data/repositories/update_account_repository_impl.dart';
+import 'features/account/presentation/blocs/account_cubit.dart';
 import 'features/alarm/data/datasources/local_alarm_data_source.dart';
 import 'features/alarm/presentation/bloc/alarm_form/alarm_form_cubit.dart';
 import 'features/alarm/presentation/bloc/alarm_list/alarm_list_cubit.dart';
@@ -114,6 +122,13 @@ Future<void> initializeDependancies() async {
   sl.registerFactory(() => AlarmFormCubit());
 
   await initializeVideoChatDependencies();
+
+  sl.registerSingleton<UpdateAccountService>(UpdateAccountService(sl()));
+  sl.registerSingleton<UpdateAccountRepository>(UpdateAccountRepositoryImpl(updateAccountService: sl()));
+  sl.registerSingleton<UploadAvatarUsecase>(UploadAvatarUsecase(apiService: sl()));
+  sl.registerSingleton<UpdateAccountUseCase>(UpdateAccountUseCase(sl()));
+  sl.registerSingleton<GetCurrentUserUsecase>(GetCurrentUserUsecase(userRepository: sl()));
+  sl.registerFactory<AccountCubit>(() => AccountCubit(updateProfileImageUseCase: sl(), getUserUseCase: sl(), updateAccountUseCase: sl(), getCurrentUserUsecase: sl()));
 }
 
 Future<void> initializeAuth() async {
@@ -125,6 +140,10 @@ Future<void> initializeAuth() async {
 
   sl.registerSingleton<UserRepository>(
       UserRepositoryImpl(sl())
+  );
+
+  sl.registerSingleton<GetUserUseCase>(
+    GetUserUseCase(sl())
   );
 
   sl.registerSingleton<GetUsersUseCase>(

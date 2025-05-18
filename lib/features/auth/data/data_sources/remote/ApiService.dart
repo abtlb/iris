@@ -18,6 +18,9 @@ abstract class ApiService {
   @GET('/User/GetUser/{username}')
   Future<HttpResponse<UserModel>> getUser(@Path('username') String username);
 
+  @GET('/User/GetCurrentUser')
+  Future<HttpResponse<UserModel>> getCurrentUser();
+
   @GET('/User/GetUsers')
   Future<HttpResponse<List<UserModel>>> getUsers();
 

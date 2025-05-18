@@ -78,7 +78,9 @@ class _CustomDrawerState extends State<CustomDrawer> {
           const SizedBox(height: 10),
           GestureDetector(
             onTap: () {
-              GoRouter.of(context).push(AppRoute.accountPath);
+              GoRouter.of(context).push(AppRoute.accountPath, extra: {
+                'prevPath': AppRoute.homePath
+              });
             },
             child: const DrawerListileItem(
               icon: Icon(FontAwesomeIcons.key, color: Colors.white, size: 22),

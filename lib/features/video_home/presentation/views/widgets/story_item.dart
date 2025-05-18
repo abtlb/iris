@@ -18,7 +18,6 @@ class StoryItem extends StatelessWidget {
             radius: sizeImage ?? 27,
             backgroundColor: Colors.blue,
             backgroundImage: imageUrl == null || imageUrl!.isEmpty? const AssetImage('assets/paper.png') : CachedNetworkImageProvider(imageUrl!),
-            // backgroundImage: const AssetImage('assets/paper.png'),
           ),
         ));
   }

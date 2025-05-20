@@ -8,6 +8,8 @@ import 'package:untitled3/features/video_chat/presentation/bloc/video_chat_bloc.
 import 'package:untitled3/features/video_chat/presentation/bloc/video_chat_events.dart';
 import 'package:untitled3/features/video_chat/presentation/bloc/video_chat_states.dart';
 
+// Import SpeechToTextService
+import 'package:untitled3/features/video_chat/  services/ speech_to_text_service.dart';
 
 import '../../../../core/util/app_route.dart';
 import '../widgets/LocalVideoWidget.dart';
@@ -26,11 +28,33 @@ class VideoChatTestPage extends StatefulWidget {
 }
 
 class _VideoChatTestPageState extends State<VideoChatTestPage> {
-  // Optionally, store any local state if necessary
+  late SpeechToTextService _speechService;
+  String recognizedText = "Say something...";
 
   @override
   void initState() {
     super.initState();
+
+    // 1. إنشاء كائن SpeechToTextService
+    _speechService = SpeechToTextService();
+
+    // 2. تهيئة خدمة التعرف على الكلام
+    _speechService.initialize().then((available) {
+      if (available) {
+        // 3. بدء الاستماع وتحويل الكلام لنص
+        _speechService.startListening((text) {
+          setState(() {
+            recognizedText = text;
+          });
+        });
+      } else {
+        setState(() {
+          recognizedText = "Speech recognition not available";
+        });
+      }
+    });
+
+    // 4. إطلاق حدث اتصال الفيديو
     context.read<VideoChatBloc>().add(VideoChatConnectionRequested(
       channelName: ChannelNameGenerator.makeChannelName(widget.username1, widget.username2),
     ));
@@ -38,8 +62,9 @@ class _VideoChatTestPageState extends State<VideoChatTestPage> {
 
   @override
   void dispose() {
+    // إيقاف الاستماع عند الخروج من الصفحة
+    _speechService.stopListening();
     super.dispose();
-    print("disposeddddddddddddd");
   }
 
   @override
@@ -52,35 +77,31 @@ class _VideoChatTestPageState extends State<VideoChatTestPage> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text("Connection Failed: ${state.exception.toString()}")),
             );
-          } else  if (state is VideoChatDisconnected) {
+          } else if (state is VideoChatDisconnected) {
             GoRouter.of(context).pushReplacement(AppRoute.homePath);
           }
         },
         builder: (context, state) {
-          print("the state issssssssssssssssssss: $state");
           if (state is VideoChatInitial) {
             return const Center(child: Text("Initializing..."));
           }
           if (state is VideoChatConnecting) {
             return const Center(child: CircularProgressIndicator());
           } else if (state is VideoChatShowRemoteUser) {
-            // Assumes state contains the Agora engine instance, the remote user ID, and channel name.
             final RtcEngine agoraEngine = state.engine;
             final int? remoteUid = state.remoteUid;
             final String channelName = ChannelNameGenerator.makeChannelName(widget.username1, widget.username2);
+
             return Column(
               children: [
-                // Display local and remote video views.
                 Expanded(
                   child: Stack(
                     children: [
-                      // Remote video: if a remote user has joined, show their video; otherwise, show waiting text.
                       RemoteVideoWidget(
                         engine: agoraEngine,
-                        remoteUid: remoteUid, // This might be null if no remote user has joined.
+                        remoteUid: remoteUid,
                         channel: channelName,
                       ),
-                      // Local video: positioned in the corner.
                       Positioned(
                         top: 16,
                         right: 16,
@@ -93,27 +114,36 @@ class _VideoChatTestPageState extends State<VideoChatTestPage> {
                     ],
                   ),
                 ),
-                // A button to end the call.
+
+                // عرض النص الذي تم التعرف عليه
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  color: Colors.grey[200],
+                  width: double.infinity,
+                  child: Text(
+                    "Recognized Text: $recognizedText",
+                    style: const TextStyle(fontSize: 16),
+                  ),
+                ),
+
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: ElevatedButton(
                     onPressed: () {
-                       context.read<VideoChatBloc>().add(VideoChatDisconnectRequested());
+                      context.read<VideoChatBloc>().add(VideoChatDisconnectRequested());
                     },
                     child: const Text("End Call"),
                   ),
                 ),
               ],
             );
-          }else if(state is VideoChatConnected) {
+          } else if (state is VideoChatConnected) {
             final RtcEngine agoraEngine = state.engine;
             return Column(
               children: [
-                // Display local and remote video views.
                 Expanded(
                   child: Stack(
                     children: [
-                      // Local video: positioned in the corner.
                       Positioned(
                         top: 16,
                         right: 16,
@@ -126,7 +156,15 @@ class _VideoChatTestPageState extends State<VideoChatTestPage> {
                     ],
                   ),
                 ),
-                // A button to end the call.
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  color: Colors.grey[200],
+                  width: double.infinity,
+                  child: Text(
+                    "Recognized Text: $recognizedText",
+                    style: const TextStyle(fontSize: 16),
+                  ),
+                ),
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: ElevatedButton(
@@ -148,7 +186,7 @@ class _VideoChatTestPageState extends State<VideoChatTestPage> {
               ),
             );
           }
-          return const Center(child: Text("Initializing...klasdfbnasdfbhjklasdfhjklsdfajkhlsdfahjkl;sdfahjkl;asdfhjkl "));
+          return const Center(child: Text("Initializing..."));
         },
       ),
     );

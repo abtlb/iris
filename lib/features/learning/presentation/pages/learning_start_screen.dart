@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:untitled3/core/util/app_route.dart';
 
 class LearningStartScreen extends StatefulWidget {
   const LearningStartScreen({Key? key}) : super(key: key);
@@ -28,18 +29,17 @@ class _LearningStartScreenState extends State<LearningStartScreen> {
             ),
           ),
 
-          // ⬅️ زر السهم في أعلى اليسار
+
           Positioned(
             top: 40,
             left: 20,
             child: IconButton(
               icon: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 30),
               onPressed: () {
-                GoRouter.of(context).go('/'); // التوجيه إلى الصفحة الرئيسية (HomePage)
+                GoRouter.of(context).go(AppRoute.homePath);
               },
             ),
           ),
-
           Align(
             alignment: Alignment.bottomCenter,
             child: Container(

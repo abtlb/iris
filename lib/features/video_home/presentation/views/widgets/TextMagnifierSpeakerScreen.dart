@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:go_router/go_router.dart'; // أضف هذا
+import 'package:untitled3/core/util/app_route.dart';
 
 class TextMagnifierSpeakerScreen extends StatefulWidget {
   const TextMagnifierSpeakerScreen({super.key});
@@ -71,6 +73,12 @@ class _TextMagnifierSpeakerScreenState extends State<TextMagnifierSpeakerScreen>
         backgroundColor: const Color(0xFFE5F0FF),
         elevation: 0,
         centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.indigo),
+          onPressed: () {
+            GoRouter.of(context).go(AppRoute.homePath);// أو context.go(AppRoute.home) لو معرف المسار في AppRoute
+          },
+        ),
         title: const Text(
           'Text Magnifier & Speaker',
           style: TextStyle(
@@ -193,7 +201,7 @@ class _TextMagnifierSpeakerScreenState extends State<TextMagnifierSpeakerScreen>
                 style: const TextStyle(
                   fontSize: 100,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white, // Needed for ShaderMask
+                  color: Colors.white,
                 ),
                 textAlign: TextAlign.center,
               ),

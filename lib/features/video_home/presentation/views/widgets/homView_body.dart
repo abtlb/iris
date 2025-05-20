@@ -28,7 +28,7 @@ class HomeviewBody extends StatelessWidget {
               children: [
                 CustomAppBar(),
                 ShowStoriesListview(),
-                CustomCategories(),
+                //CustomCategories(),
               ],
             ),
           ),

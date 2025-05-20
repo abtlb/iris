@@ -8,18 +8,21 @@ import 'package:untitled3/features/chat/presentation/views/chat_view.dart';
 import 'package:untitled3/features/learning/presentation/pages/learning_home.dart';
 import 'package:untitled3/features/learning/presentation/pages/learning_start_screen.dart';
 import 'package:untitled3/features/sound_detection/presentation/pages/sound_monitor_page.dart';
-import 'package:untitled3/features/video_home/presentation/views/home_view.dart';
+import 'package:untitled3/features/video_home/presentation/views/widgets/homView_body.dart';
+
 import 'package:untitled3/features/search/presentation/views/search_view.dart';
 import 'package:untitled3/features/video_chat/presentation/pages/VideoChatTest.dart';
 import 'package:untitled3/features/video_home/presentation/views/widgets/help_screen.dart';
 import 'package:untitled3/features/video_home/presentation/views/widgets/account_page.dart';
 import 'package:untitled3/features/video_home/presentation/views/widgets/TextMagnifierSpeakerScreen.dart';
 import 'package:untitled3/features/auth/presentation/pages/home_page .dart';
+import 'package:untitled3/features/video_home/presentation/views/home_view.dart';
 
 abstract class AppRoute {
   static String welcomePath = '/';
-  static String homePath = '/main'; // تعديل المسار لـ HomePage هنا
+  static String homePath = '/main';
   static String kChatPath = '/chat';
+  static String kChatHomePath = '/chat_home'; // 👈 جديد
   static String kSearchPath = '/search';
   static String signInPath = '/signin';
   static String signUpPath = '/signup';
@@ -33,19 +36,21 @@ abstract class AppRoute {
   static String learningStart = '/learningStart';
   static String soundDetection = '/soundDetection';
 
-  // إعادة استخدام بعض المسارات بأسماء أبسط
-  static String chatHome = kChatPath;
+
+  // لإعادة الاستخدام
+  static String chatHome = kChatHomePath;
   static String magnify = magnifierPath;
   static String alarm = helpPath;
 
   static final router = GoRouter(
     routes: [
-      GoRoute(path: welcomePath, builder: (_, __) => WelcomeScreen()), // ممكن تبقي الصفحة الرئيسية
+      GoRoute(path: welcomePath, builder: (_, __) => WelcomeScreen()),
+      GoRoute(path: homePath, builder: (_, __) => const HomePage()),
 
-      // تعديل المسار الخاص بـ HomePage
-      GoRoute(path: homePath, builder: (_, __) => const HomePage()),  // هنا نغير المسار لـ "/main" أو أي مسار آخر تحبيه
+      // شاشة الشات الرئيسية HomeviewBody
+      GoRoute(path: kChatHomePath, builder: (_, __) => const HomeView()),
 
-      // Chat route with extra
+      // ChatView التقليدي (مستخدم عند وجود senderId/receiverId)
       GoRoute(
         path: kChatPath,
         builder: (context, state) {
@@ -62,7 +67,6 @@ abstract class AppRoute {
       GoRoute(path: signUpPath, builder: (_, __) => const SignUpScreen()),
       GoRoute(path: forgetPasswordPath, builder: (_, __) => const ForgotPasswordScreen()),
       GoRoute(path: chatTestPath, builder: (_, __) => const ChatTestScreen()),
-
       GoRoute(
         path: videoChatTestPath,
         builder: (context, state) {
@@ -73,7 +77,6 @@ abstract class AppRoute {
           );
         },
       ),
-
       GoRoute(path: helpPath, builder: (_, __) => const HelpScreen()),
       GoRoute(path: accountPath, builder: (_, __) => const AccountPage()),
       GoRoute(path: learningHome, builder: (_, __) => const LearningHome()),
@@ -83,7 +86,6 @@ abstract class AppRoute {
     ],
   );
 }
-
 
 
 

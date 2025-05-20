@@ -12,6 +12,8 @@ import 'providers/language_provider.dart';
 import 'package:get_it/get_it.dart';
 import 'package:untitled3/core/util/app_route.dart';
 
+
+
 Future<void> main() async {
   await initializeDependancies();
   final GetIt locator = GetIt.instance;

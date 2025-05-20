@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
 import 'package:go_router/go_router.dart';
+import 'package:untitled3/core/util/app_route.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -14,11 +15,11 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   late Animation<double> _animation;
 
   final List<Map<String, dynamic>> icons = [
-    {'icon': Icons.school, 'label': 'Learning', 'route': '/learningStart'}, // هذا المسار يشير إلى الصفحة التي تريدها
-    {'icon': Icons.chat, 'label': 'Chat', 'route': '/chat'},
-    {'icon': Icons.zoom_in, 'label': 'Magnify', 'route': '/magnify'},
-    {'icon': Icons.alarm, 'label': 'Alarm', 'route': '/alarm'},
-    {'icon': Icons.hearing, 'label': 'Sound Detection', 'route': '/sound-detection'},
+    {'icon': Icons.school, 'label': 'Learning', 'route': AppRoute.learningStart},
+    {'icon': Icons.chat, 'label': 'Chat', 'route': AppRoute.kChatHomePath}, // ✅ مسار الشات الكامل (HomeView)
+    {'icon': Icons.zoom_in, 'label': 'Magnify', 'route': AppRoute.magnifierPath},
+    {'icon': Icons.alarm, 'label': 'Alarm', 'route': AppRoute.alarm},
+    {'icon': Icons.hearing, 'label': 'Sound Detection', 'route': AppRoute.soundDetection},
   ];
 
   @override
@@ -97,7 +98,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                   ),
                 ],
               ),
-
               AnimatedBuilder(
                 animation: _animation,
                 builder: (context, child) {
@@ -118,8 +118,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                         top: centerY + offset.dy - 45,
                         child: GestureDetector(
                           onTap: () {
-                            // هنا نتحقق إذا كانت الأيقونة هي "Learning" أو أي مسار آخر.
-                            context.go(icons[index]['route']); // التوجيه للمسار المحدد
+                            context.go(icons[index]['route']);
                           },
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
@@ -150,7 +149,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                   );
                 },
               ),
-
               const Positioned(
                 bottom: 30,
                 left: 0,
@@ -173,4 +171,3 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     );
   }
 }
-

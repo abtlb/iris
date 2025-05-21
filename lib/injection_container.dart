@@ -36,6 +36,9 @@ import 'package:untitled3/features/sound_detection/data/repositories/sound_repos
 import 'package:untitled3/features/sound_detection/domain/repositories/sound_repository.dart';
 import 'package:untitled3/features/sound_detection/domain/usecases/start_sound_classification_use_case.dart';
 import 'package:untitled3/features/sound_detection/presentation/bloc/sound_monitor_cubit.dart';
+import 'package:untitled3/features/video_chat/data/others/asl_detector.dart';
+import 'package:untitled3/features/video_chat/data/others/frame_observer.dart';
+import 'package:untitled3/features/video_chat/domain/usecases/getPredictionStream.dart';
 import 'package:untitled3/features/video_home/data/data_source/ConversationService.dart';
 import 'package:untitled3/features/video_home/domain/repository/ChatHomeRepository.dart';
 import 'package:untitled3/features/video_home/domain/usecase/GetConversationsUsecase.dart';
@@ -60,6 +63,7 @@ import 'features/auth/presentation/bloc/auth/sign_up/sign_up_bloc.dart';
 import 'features/chat/presentation/blocs/chat_bloc.dart';
 import 'features/sound_detection/domain/usecases/monitor_sound.dart';
 import 'features/sound_detection/domain/usecases/stop_sound_classification_use_case.dart';
+import 'features/video_chat/data/others/hands_service.dart';
 import 'features/video_home/data/repository/ChatHomeRepositoryImpl.dart';
 
 final sl = GetIt.instance;
@@ -176,8 +180,11 @@ Future<void> initializeVideoChatDependencies() async {
     AgoraService(sl())
   );
 
+  sl.registerSingleton<ASLDetector>(await ASLDetector.initialize());
+  sl.registerSingleton<Hands>(await Hands.initialize());
+  sl.registerSingleton<FrameObserver>(FrameObserver(aslDetector: sl(), hands: sl()));
   sl.registerSingleton<VideoChatRepository>(
-        AgoraVideoChatRepository(agoraService: sl()),
+        AgoraVideoChatRepository(agoraService: sl(), frameObserver: sl()),
   );
 
 
@@ -197,6 +204,8 @@ Future<void> initializeVideoChatDependencies() async {
   sl.registerSingleton<GetRemoteUserStreamUsecase>(
     GetRemoteUserStreamUsecase(repository: sl()),
   );
+
+  sl.registerSingleton<GetPredictionStreamUsecase>(GetPredictionStreamUsecase(videoChatRepository: sl()));
 
   // Register the BLoC. Using registerFactory here to create a new instance each time.
   sl.registerFactory<VideoChatBloc>(() => VideoChatBloc(

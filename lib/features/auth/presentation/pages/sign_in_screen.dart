@@ -220,6 +220,15 @@ class _SignInScreenState extends State<SignInScreen> {
                   style: TextStyle(fontSize: descriptionFontSize, color: Colors.blue),
                 ),
               ),
+              TextButton( // todo: REMOVE
+                onPressed: () {
+                  context.go(AppRoute.handTracking);
+                },
+                child: Text(
+                  "Hand detection",
+                  style: TextStyle(fontSize: descriptionFontSize, color: Colors.blue),
+                ),
+              ),
             ],
           ),
         ),

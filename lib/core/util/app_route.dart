@@ -12,6 +12,7 @@ import 'package:untitled3/features/chat/presentation/views/chat_view.dart';
 import 'package:untitled3/features/learning/presentation/pages/learning_home.dart';
 import 'package:untitled3/features/learning/presentation/pages/learning_start_screen.dart';
 import 'package:untitled3/features/sound_detection/presentation/pages/sound_monitor_page.dart';
+import 'package:untitled3/features/video_chat/presentation/pages/HandTrackingWidget.dart';
 import 'package:untitled3/features/video_home/presentation/views/home_view.dart';
 import 'package:untitled3/features/search/presentation/views/search_view.dart';
 import 'package:untitled3/features/video_chat/presentation/pages/VideoChatTest.dart';
@@ -42,6 +43,7 @@ abstract class AppRoute {
   static String soundDetection = '/soundDetection';
   static String alarmPath = '/alarm';
   static String setAlarmPath = '/set_alarm';
+  static String handTracking = '/handTracking';
 
   static final navigatorKey = GlobalKey<NavigatorState>();
   static final RouteObserver<ModalRoute<void>> routeObserver = RouteObserver<ModalRoute<void>>();
@@ -92,6 +94,7 @@ abstract class AppRoute {
 
       GoRoute(path: magnifierPath, builder: (_, __) => const TextMagnifierSpeakerScreen()),
       GoRoute(path: alarmPath, builder: (_, __) => const AlarmPage()),
+      GoRoute(path: handTracking, builder: (_, __) => HandTrackingWidget()),
       GoRoute(
         path: AppRoute.setAlarmPath,
         builder: (context, state) {

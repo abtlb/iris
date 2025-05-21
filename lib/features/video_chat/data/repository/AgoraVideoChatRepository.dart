@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:untitled3/features/video_chat/data/data_sources/AgoraService.dart';
+import 'package:untitled3/features/video_chat/data/others/frame_observer.dart';
 import 'package:untitled3/features/video_chat/domain/repository/VideoChatRepository.dart';
 
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
@@ -12,8 +13,9 @@ class AgoraVideoChatRepository implements VideoChatRepository {
   final _remoteUserStreamController = StreamController<int?>.broadcast();
   final _localUserStreamController = StreamController<int?>.broadcast();
   final AgoraService agoraService;
+  final FrameObserver frameObserver;
 
-  AgoraVideoChatRepository({required this.agoraService});
+  AgoraVideoChatRepository({required this.agoraService, required this.frameObserver});
 
   @override
   Stream<int?> get remoteUserStream => _remoteUserStreamController.stream;
@@ -28,6 +30,9 @@ class AgoraVideoChatRepository implements VideoChatRepository {
       appId: "550b081e687947dd9d793b39b7683759",
       channelProfile: ChannelProfileType.channelProfileCommunication,
     ));
+
+    var mediaEngine = _engine?.getMediaEngine();
+    mediaEngine!.registerVideoFrameObserver(VideoFrameObserver(onCaptureVideoFrame: frameObserver.receiveFrame));
 
     return _engine!;
   }
@@ -94,6 +99,9 @@ class AgoraVideoChatRepository implements VideoChatRepository {
     return response.token;
   }
 
-
+  @override
+  Stream<String> getPredictionStream() {
+    return frameObserver.getPredictionStream();
+  }
   
 }

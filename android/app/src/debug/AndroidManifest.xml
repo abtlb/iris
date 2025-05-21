@@ -1,4 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    package="com.google.mediapipe.apps.aar_example" >
     <application
         android:label="untitled3"
         android:name="${applicationName}"

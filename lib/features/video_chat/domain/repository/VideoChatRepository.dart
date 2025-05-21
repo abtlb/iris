@@ -9,5 +9,6 @@ abstract class VideoChatRepository {
   Future<void> setupLocalVideo();
   Future<void> cleanupEngine();
   Future<void> requestPermissions();
+  Stream<String> getPredictionStream();
   Future<String> getChatToken(String channelName);
 }

@@ -1,0 +1,2 @@
+C:/Users/balla/StudioProjects/gradprojettest/android/app/.cxx/Debug/2z3y1o58/x86/CMakeFiles/edit_cache.dir
+C:/Users/balla/StudioProjects/gradprojettest/android/app/.cxx/Debug/2z3y1o58/x86/CMakeFiles/rebuild_cache.dir

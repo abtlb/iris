@@ -41,3 +41,6 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+/android/app/libs/hand_tracking_aar.aar
+/android/app/src/main/jniLibs/arm64-v8a/libmediapipe_jni.so
+/android/app/src/main/jniLibs/armeabi-v7a/libmediapipe_jni.so

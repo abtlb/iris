@@ -1,5 +1,6 @@
 // lib/features/video_chat/services/speech_to_text_service.dart
 import 'package:speech_to_text/speech_to_text.dart' as stt;
+import 'package:untitled3/features/video_chat/services/ speech_to_text_service.dart';
 
 class SpeechToTextService {
   late stt.SpeechToText _speech;

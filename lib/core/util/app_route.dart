@@ -40,6 +40,7 @@ abstract class AppRoute {
 
 
 
+
   // لإعادة الاستخدام
   static String chatHome = kChatHomePath;
   static String magnify = magnifierPath;

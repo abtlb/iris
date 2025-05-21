@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'emergency_alert_page.dart';
+import 'package:untitled3/core/util/app_route.dart';
+import 'package:go_router/go_router.dart';
+
 
 class SoundAlertPage extends StatefulWidget {
   @override
@@ -57,7 +60,9 @@ class _SoundAlertPageState extends State<SoundAlertPage> with SingleTickerProvid
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.indigo),
           onPressed: () {
-            Navigator.pop(context);
+
+            GoRouter.of(context).go(AppRoute.homePath);
+
           },
         ),
         centerTitle: true,

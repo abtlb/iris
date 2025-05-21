@@ -10,10 +10,10 @@ part of 'AgoraService.dart';
 
 class _AgoraService implements AgoraService {
   _AgoraService(
-    this._dio, {
-    this.baseUrl,
-  }) {
-    baseUrl ??= 'http://gradprojapi.somee.com/api';
+      this._dio, {
+        this.baseUrl,
+      }) {
+    baseUrl ??= 'http://gradprojapi.somee.com/api';  // fallback للbaseUrl
   }
 
   final Dio _dio;
@@ -21,24 +21,26 @@ class _AgoraService implements AgoraService {
   String? baseUrl;
 
   @override
-  Future<TokenResponse> getToken(channelName) async {
+  Future<TokenResponse> getToken(String channelName) async {
     const _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{r'channelName': channelName};
+    final queryParameters = <String, dynamic>{'channelName': channelName};
     final _headers = <String, dynamic>{};
     final Map<String, dynamic>? _data = null;
-    final _result = await _dio
-        .fetch<Map<String, dynamic>>(_setStreamType<TokenResponse>(Options(
-      method: 'GET',
-      headers: _headers,
-      extra: _extra,
-    )
-            .compose(
-              _dio.options,
-              '/Agora/token',
-              queryParameters: queryParameters,
-              data: _data,
-            )
-            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+
+    final _result = await _dio.fetch<Map<String, dynamic>>(
+      _setStreamType<TokenResponse>(
+        Options(
+          method: 'GET',
+          headers: _headers,
+          extra: _extra,
+        ).compose(
+          _dio.options,
+          '/Agora/token',
+          queryParameters: queryParameters,
+          data: _data,
+        ).copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl),
+      ),
+    );
     final value = TokenResponse.fromJson(_result.data!);
     return value;
   }

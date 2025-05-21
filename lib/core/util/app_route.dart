@@ -17,6 +17,8 @@ import 'package:untitled3/features/video_home/presentation/views/widgets/account
 import 'package:untitled3/features/video_home/presentation/views/widgets/TextMagnifierSpeakerScreen.dart';
 import 'package:untitled3/features/auth/presentation/pages/home_page .dart';
 import 'package:untitled3/features/video_home/presentation/views/home_view.dart';
+import '../../features/sound_detection/presentation/pages/sound_alert_page.dart';
+
 
 abstract class AppRoute {
   static String welcomePath = '/';
@@ -35,6 +37,7 @@ abstract class AppRoute {
   static String learningHome = '/learningHome';
   static String learningStart = '/learningStart';
   static String soundDetection = '/soundDetection';
+
 
 
   // لإعادة الاستخدام
@@ -82,7 +85,7 @@ abstract class AppRoute {
       GoRoute(path: learningHome, builder: (_, __) => const LearningHome()),
       GoRoute(path: learningStart, builder: (_, __) => const LearningStartScreen()),
       GoRoute(path: magnifierPath, builder: (_, __) => const TextMagnifierSpeakerScreen()),
-      GoRoute(path: soundDetection, builder: (_, __) => const SoundMonitorPage()),
+      GoRoute(path: soundDetection, builder: (_, __) =>  SoundAlertPage()),
     ],
   );
 }

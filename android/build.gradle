@@ -1,9 +1,21 @@
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        // تأكد من رفع نسخة Android Gradle Plugin لـ 8.3.0 أو أحدث
+        classpath 'com.android.tools.build:gradle:8.3.0'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.20"
+    }
+}
+
 allprojects {
     repositories {
         google()
         mavenCentral()
         maven { url "https://download.agora.io/sdk/maven" }
-        // If needed, also add Flutter's repository:
+        // Flutter's repository
         maven { url "https://storage.googleapis.com/download.flutter.io" }
     }
 }

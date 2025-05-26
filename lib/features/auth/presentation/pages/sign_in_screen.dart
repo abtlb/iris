@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -7,29 +6,19 @@ import 'package:untitled3/core/util/app_route.dart';
 import 'package:untitled3/features/auth/presentation/bloc/auth/sign_in/sign_in_bloc.dart';
 import 'package:untitled3/features/auth/presentation/bloc/auth/sign_in/sign_in_events.dart';
 import 'package:untitled3/features/auth/presentation/bloc/auth/sign_in/sign_in_states.dart';
-import 'package:untitled3/features/chat/presentation/pages/chat_screen_testing.dart';
 import '../../../../providers/language_provider.dart';
 import 'ForgotPasswordScreen.dart';
-import '../../data/data_sources/remote/ApiService.dart';
-import 'package:intl/intl.dart';
-import 'package:untitled3/core/storage/storage.dart';
 
 class SignInScreen extends StatefulWidget {
-  const SignInScreen({super.key});
+  const SignInScreen({Key? key}) : super(key: key);
 
   @override
-  createState() => _SignInScreenState();
+  State<SignInScreen> createState() => _SignInScreenState();
 }
 
 class _SignInScreenState extends State<SignInScreen> {
-  double titleFontSize = 30.0;
-  double descriptionFontSize = 18.0;
-  double buttonFontSize = 18.0;
-  double textFieldFontSize = 20.0;
-
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-
   String? errorMessage;
 
   void _showError(String error) {
@@ -39,8 +28,8 @@ class _SignInScreenState extends State<SignInScreen> {
   }
 
   bool validateInput(LanguageProvider languageProvider) {
-    String username = _usernameController.text.trim();
-    String password = _passwordController.text;
+    final username = _usernameController.text.trim();
+    final password = _passwordController.text;
 
     if (username.isEmpty) {
       _showError(languageProvider.translate('usernameEmpty'));
@@ -67,12 +56,10 @@ class _SignInScreenState extends State<SignInScreen> {
       errorMessage = null;
     });
 
-    BlocProvider.of<SignInBloc>(context).add(
-      SignInRequested(
-        username: _usernameController.text.trim(),
-        password: _passwordController.text,
-      ),
-    );
+    BlocProvider.of<SignInBloc>(context).add(SignInRequested(
+      username: _usernameController.text.trim(),
+      password: _passwordController.text,
+    ));
   }
 
   @override
@@ -80,7 +67,18 @@ class _SignInScreenState extends State<SignInScreen> {
     final languageProvider = Provider.of<LanguageProvider>(context);
 
     return Scaffold(
-      appBar: buildAppbar(languageProvider),
+      appBar: AppBar(
+        title: Text(
+          languageProvider.translate('signIn'),
+          style: const TextStyle(color: Colors.blue),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.language),
+            onPressed: languageProvider.toggleLanguage,
+          ),
+        ],
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
@@ -88,31 +86,23 @@ class _SignInScreenState extends State<SignInScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const SizedBox(height: 130),
-              Text(
+              const Text(
                 "SignChat",
                 style: TextStyle(
-                  fontSize: titleFontSize + 10,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blue,
-                ),
+                    fontSize: 40, fontWeight: FontWeight.bold, color: Colors.blue),
               ),
               const SizedBox(height: 20),
               Text(
                 languageProvider.translate('signInDescription'),
-                style: TextStyle(
-                  fontSize: descriptionFontSize,
-                  color: Colors.grey[600],
-                ),
+                style: TextStyle(fontSize: 18, color: Colors.grey[600]),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 20),
-
               TextField(
                 controller: _usernameController,
-                style: TextStyle(fontSize: textFieldFontSize),
                 decoration: InputDecoration(
                   labelText: languageProvider.translate('Username'),
-                  labelStyle: TextStyle(fontSize: textFieldFontSize, color: Colors.blue),
+                  labelStyle: const TextStyle(color: Colors.blue),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(30.0),
                   ),
@@ -122,39 +112,27 @@ class _SignInScreenState extends State<SignInScreen> {
               TextField(
                 controller: _passwordController,
                 obscureText: true,
-                style: TextStyle(fontSize: textFieldFontSize),
                 decoration: InputDecoration(
                   labelText: languageProvider.translate('Password'),
-                  labelStyle: TextStyle(fontSize: textFieldFontSize, color: Colors.blue),
+                  labelStyle: const TextStyle(color: Colors.blue),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(30.0),
                   ),
                 ),
               ),
               const SizedBox(height: 10),
-
               if (errorMessage != null)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: Text(
-                    errorMessage!,
-                    style: const TextStyle(color: Colors.red),
-                  ),
-                ),
-
+                Text(errorMessage!, style: const TextStyle(color: Colors.red)),
+              const SizedBox(height: 10),
               BlocConsumer<SignInBloc, SignInState>(
                 listener: (context, state) {
                   if (state is SignInSuccess) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text(languageProvider.translate('signInSuccess'))),
                     );
-                    context.go(AppRoute.homePath);
+                    context.go(AppRoute.homePath); // ✅ الانتقال إلى الصفحة الرئيسية بعد تسجيل الدخول الناجح
                   } else if (state is SignInFailure) {
-                    if (state.message.contains('Wrong Username or Password')) {
-                      _showError(languageProvider.translate('Wrong Username or Password'));
-                    } else {
-                      _showError(languageProvider.translate('Wrong Username or Password'));
-                    }
+                    _showError(languageProvider.translate('Wrong Username or Password'));
                   }
                 },
                 builder: (context, state) {
@@ -169,55 +147,24 @@ class _SignInScreenState extends State<SignInScreen> {
                     ),
                     child: Text(
                       languageProvider.translate('signIn'),
-                      style: TextStyle(fontSize: buttonFontSize, color: Colors.white),
+                      style: const TextStyle(color: Colors.white, fontSize: 18),
                     ),
                   );
                 },
               ),
-
               const SizedBox(height: 10),
-
               TextButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const ForgotPasswordScreen(),
-                    ),
-                  );
-                },
+                onPressed: () => context.push(AppRoute.forgetPasswordPath),
                 child: Text(
                   languageProvider.translate('forgotPassword'),
-                  style: TextStyle(fontSize: descriptionFontSize, color: Colors.blue),
+                  style: const TextStyle(color: Colors.blue),
                 ),
               ),
-
-              // ✅ Updated Sign Up Button Here
               TextButton(
-                onPressed: () {
-                  context.go(AppRoute.signUpPath);
-                },
+                onPressed: () => context.go(AppRoute.signUpPath),
                 child: Text(
                   languageProvider.translate('noAccount'),
-                  style: TextStyle(fontSize: descriptionFontSize, color: Colors.blue),
-                ),
-              ),
-              TextButton( // todo: REMOVE
-                onPressed: () {
-                  context.go(AppRoute.learningHome);
-                },
-                child: Text(
-                  "Learning home",
-                  style: TextStyle(fontSize: descriptionFontSize, color: Colors.blue),
-                ),
-              ),
-              TextButton( // todo: REMOVE
-                onPressed: () {
-                  context.go(AppRoute.soundDetection);
-                },
-                child: Text(
-                  "Sound Detection",
-                  style: TextStyle(fontSize: descriptionFontSize, color: Colors.blue),
+                  style: const TextStyle(color: Colors.blue),
                 ),
               ),
               TextButton( // todo: REMOVE
@@ -235,29 +182,7 @@ class _SignInScreenState extends State<SignInScreen> {
       ),
     );
   }
-
-  AppBar buildAppbar(LanguageProvider languageProvider) {
-    return AppBar(
-      title: Text(
-        languageProvider.translate('signIn'),
-        style: TextStyle(
-          fontSize: titleFontSize,
-          color: Colors.blue,
-        ),
-      ),
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.language),
-          onPressed: languageProvider.toggleLanguage,
-        ),
-      ],
-    );
-  }
 }
-
-
-
-
 
 
 

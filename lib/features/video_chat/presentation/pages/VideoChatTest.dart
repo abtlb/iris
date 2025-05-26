@@ -65,7 +65,7 @@ class _VideoChatTestPageState extends State<VideoChatTestPage> {
                   SnackBar(content: Text("Connection failed: ${state.exception}")),
                 );
               } else if (state is VideoChatDisconnected) {
-                context.go(AppRoute.homePath);
+                context.go(AppRoute.chatHomePath);
               }
             },
             builder: (context, state) {

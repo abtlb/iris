@@ -19,7 +19,7 @@ class CustomAppbarChat extends StatelessWidget {
           children: [
             IconButton(
               onPressed: () {
-                GoRouter.of(context).push(AppRoute.homePath);
+                GoRouter.of(context).push(AppRoute.chatHomePath);
               },
               icon: const Icon(Icons.arrow_back),
               color: Colors.blue,

@@ -79,7 +79,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
           GestureDetector(
             onTap: () {
               GoRouter.of(context).push(AppRoute.accountPath, extra: {
-                'prevPath': AppRoute.homePath
+                'prevPath': AppRoute.chatHomePath
               });
             },
             child: const DrawerListileItem(
@@ -148,7 +148,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 ScaffoldMessenger.of(currentContext).showSnackBar(
                   const SnackBar(content: Text("Avatar uploaded! Reloading…")),
                 );
-                GoRouter.of(currentContext).push(AppRoute.homePath
+                GoRouter.of(currentContext).push(AppRoute.chatHomePath
                 );
               }
 

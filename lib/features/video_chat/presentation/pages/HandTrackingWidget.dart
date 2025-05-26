@@ -38,16 +38,14 @@ class HandTrackingWidget extends StatelessWidget {
               try {
                 final list = NormalizedLandmarkList.fromBuffer(rawBytes);
                 GetIt.instance<ASLDetector>().predictFromLandmarks(list.landmark);
-                print("Decoded landmarks: ${list.landmark.length}");
               } catch (e) {
                 print("FAILED TO PARSE: $e");
               }
             }, onError: (e) {
               print("Stream error: $e");
             });
-          });
+          })..create();
 
-        view.create();
         return view;
       },
     );

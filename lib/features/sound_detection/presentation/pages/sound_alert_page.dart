@@ -61,7 +61,7 @@ class _SoundAlertPageState extends State<SoundAlertPage> with SingleTickerProvid
           icon: Icon(Icons.arrow_back, color: Colors.indigo),
           onPressed: () {
 
-            GoRouter.of(context).go(AppRoute.homePath);
+            GoRouter.of(context).go(AppRoute.chatHomePath);
 
           },
         ),

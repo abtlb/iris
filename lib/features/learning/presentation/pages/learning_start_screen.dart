@@ -36,7 +36,7 @@ class _LearningStartScreenState extends State<LearningStartScreen> {
             child: IconButton(
               icon: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 30),
               onPressed: () {
-                GoRouter.of(context).go(AppRoute.homePath);
+                GoRouter.of(context).go(AppRoute.chatHomePath);
               },
             ),
           ),

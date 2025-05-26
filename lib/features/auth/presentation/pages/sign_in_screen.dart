@@ -171,9 +171,9 @@ class _SignInScreenState extends State<SignInScreen> {
                 onPressed: () {
                   context.go(AppRoute.handTracking);
                 },
-                child: Text(
+                child: const Text(
                   "Hand detection",
-                  style: TextStyle(fontSize: descriptionFontSize, color: Colors.blue),
+                  style: TextStyle(color: Colors.blue),
                 ),
               ),
             ],

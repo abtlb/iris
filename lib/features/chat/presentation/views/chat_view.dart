@@ -16,7 +16,7 @@ class ChatView extends StatelessWidget {
       onPopInvokedWithResult: (didPop, result) async {
         if (!didPop) {
           // navigate to home
-          GoRouter.of(context).push(AppRoute.homePath);
+          GoRouter.of(context).push(AppRoute.chatHomePath);
         }
       },
       child: Scaffold(

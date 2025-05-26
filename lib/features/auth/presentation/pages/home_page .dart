@@ -16,9 +16,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
   final List<Map<String, dynamic>> icons = [
     {'icon': Icons.school, 'label': 'Learning', 'route': AppRoute.learningStart},
-    {'icon': Icons.chat, 'label': 'Chat', 'route': AppRoute.kChatHomePath}, // ✅ مسار الشات الكامل (HomeView)
+    {'icon': Icons.chat, 'label': 'Chat', 'route': AppRoute.chatHomePath},
     {'icon': Icons.zoom_in, 'label': 'Magnify', 'route': AppRoute.magnifierPath},
-    {'icon': Icons.alarm, 'label': 'Alarm', 'route': AppRoute.alarm},
+    {'icon': Icons.alarm, 'label': 'Alarm', 'route': AppRoute.alarmPath},
     {'icon': Icons.hearing, 'label': 'Sound Detection', 'route': AppRoute.soundDetection},
   ];
 

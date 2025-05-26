@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:untitled3/features/auth/presentation/pages/ForgotPasswordScreen.dart';
+import 'package:untitled3/features/auth/presentation/pages/home_page%20.dart';
 import 'package:untitled3/features/auth/presentation/pages/sign_in_screen.dart';
 import 'package:untitled3/features/auth/presentation/pages/sign_up_screen.dart';
 import 'package:untitled3/features/auth/presentation/pages/welcome_screen.dart';
@@ -23,17 +24,18 @@ import 'package:untitled3/main.dart';
 import '../../features/alarm/domain/entities/alarm_entity.dart';
 import '../../features/alarm/presentation/pages/alarm_page.dart';
 import '../../features/alarm/presentation/pages/set_alarm_page.dart';
+import '../../features/sound_detection/presentation/pages/sound_alert_page.dart';
 import '../../features/video_home/presentation/views/widgets/TextMagnifierSpeakerScreen.dart';
 
 abstract class AppRoute {
   static String welcomePath = '/';
-  static String homePath = '/video_home';
-  static String kChatPath = '/ChatView';
+  //todo solve
+  static String chatHomePath = '/chat_home';
+  static String kChatPath = '/chat';
   static String kSearchPath = '/SearchView';
   static String homePath = '/main';
-  static String kChatPath = '/chat';
-  static String kChatHomePath = '/chat_home'; // 👈 جديد
-  static String kSearchPath = '/search';
+  //static String kSearchPath = '/search';
+
   static String signInPath = '/signin';
   static String signUpPath = '/signup';
   static String forgetPasswordPath = '/forgot_password';
@@ -53,19 +55,13 @@ abstract class AppRoute {
   static final RouteObserver<ModalRoute<void>> routeObserver = RouteObserver<ModalRoute<void>>();
 
 
-
-
-  // لإعادة الاستخدام
-  static String chatHome = kChatHomePath;
-  static String magnify = magnifierPath;
-  static String alarm = helpPath;
-
   static final router = GoRouter(
     observers: [routeObserver],
     navigatorKey: navigatorKey,
     routes: [
+      GoRoute(path: homePath, builder: (_, __) => const HomePage()),
       GoRoute(path: welcomePath, builder: (_, __) => WelcomeScreen()),
-      GoRoute(path: homePath, builder: (_, __) => const HomeView()),
+      GoRoute(path: chatHomePath, builder: (_, __) => const HomeView()),
       GoRoute(path: kChatPath, builder: (context, state) {
         final extra = state.extra as Map<String, dynamic>;
         return ChatView(

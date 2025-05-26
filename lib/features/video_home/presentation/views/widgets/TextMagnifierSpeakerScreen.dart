@@ -76,7 +76,7 @@ class _TextMagnifierSpeakerScreenState extends State<TextMagnifierSpeakerScreen>
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.indigo),
           onPressed: () {
-            GoRouter.of(context).go(AppRoute.homePath);// أو context.go(AppRoute.home) لو معرف المسار في AppRoute
+            GoRouter.of(context).go(AppRoute.chatHomePath);// أو context.go(AppRoute.home) لو معرف المسار في AppRoute
           },
         ),
         title: const Text(

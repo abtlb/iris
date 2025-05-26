@@ -51,7 +51,7 @@ class HandTrackingPlatformView(
         )
         setupProcessorCallbacks()
         PermissionHelper.checkAndRequestCameraPermissions(activity)
-        if (PermissionHelper.cameraPermissionsGranted(activity)) onResume()
+//        if (PermissionHelper.cameraPermissionsGranted(activity)) onResume()
     }
 
     private fun setupEventChannel() {

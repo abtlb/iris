@@ -25,7 +25,7 @@ class CustomCategories extends StatelessWidget {
                 CustomCategory(
                   title: 'Coversations',
                   width: 120,
-                  backgroundColor: state is CategoriesIndex1 ? kContainerColor : kPrimarycolor,
+                  backgroundColor: state is CategoriesIndex1 ? kContainerColor : kPrimaryColor,
                   textColor: state is CategoriesIndex1 ? Colors.white : Colors.grey,
                   onTap: () {
                     context.read<SelectCategoryCubit>().selectCategory(1);
@@ -36,7 +36,7 @@ class CustomCategories extends StatelessWidget {
                   width: 90,
                   title: 'Unread',
                   textColor: state is CategoriesIndex2 ? Colors.white : Colors.grey,
-                  backgroundColor: state is CategoriesIndex2 ? kContainerColor : kPrimarycolor,
+                  backgroundColor: state is CategoriesIndex2 ? kContainerColor : kPrimaryColor,
                   onTap: () {
                     context.read<SelectCategoryCubit>().selectCategory(2);
                   },
@@ -45,7 +45,7 @@ class CustomCategories extends StatelessWidget {
                   width: 70,
                   title: 'Calls',
                   textColor: state is CategoriesIndex3 ? Colors.white : Colors.grey,
-                  backgroundColor: state is CategoriesIndex3 ? kContainerColor : kPrimarycolor,
+                  backgroundColor: state is CategoriesIndex3 ? kContainerColor : kPrimaryColor,
                   onTap: () {
                     context.read<SelectCategoryCubit>().selectCategory(3);
                   },
@@ -54,7 +54,7 @@ class CustomCategories extends StatelessWidget {
                   width: 100,
                   title: 'Learning',
                   textColor: state is CategoriesIndex4 ? Colors.white : Colors.grey,
-                  backgroundColor: state is CategoriesIndex4 ? kContainerColor : kPrimarycolor,
+                  backgroundColor: state is CategoriesIndex4 ? kContainerColor : kPrimaryColor,
                   onTap: () {
                     context.read<SelectCategoryCubit>().selectCategory(4);
                   },
@@ -63,7 +63,7 @@ class CustomCategories extends StatelessWidget {
                   width: 110,
                   title: 'Magnifier',
                   textColor: state is CategoriesIndex5 ? Colors.white : Colors.grey,
-                  backgroundColor: state is CategoriesIndex5 ? kContainerColor : kPrimarycolor,
+                  backgroundColor: state is CategoriesIndex5 ? kContainerColor : kPrimaryColor,
                   onTap: () {
                     context.read<SelectCategoryCubit>().selectCategory(5);
                     context.push(AppRoute.magnifierPath); // ✅ Navigate to Magnifier screen
@@ -74,7 +74,7 @@ class CustomCategories extends StatelessWidget {
                   width: 110,
                   title: 'Alarm',
                   textColor: state is CategoriesIndex6 ? Colors.white : Colors.grey,
-                  backgroundColor: state is CategoriesIndex6 ? kContainerColor : kPrimarycolor,
+                  backgroundColor: state is CategoriesIndex6 ? kContainerColor : kPrimaryColor,
                   onTap: () {
                     context.read<SelectCategoryCubit>().selectCategory(5);
                     context.push(AppRoute.alarmPath);

@@ -6,13 +6,16 @@ import 'package:untitled3/core/storage/storage.dart';
 import 'package:untitled3/features/chat/data/models/message.dart';
 import 'package:logging/logging.dart';
 
+import '../../../../core/env.dart';
+
 class ChatService {
   late HubConnection _hubConnection;
   final SecureStorage secureStorage;
   bool _isConnecting = false;
+  String? username;
+  String? token;
 
-  ChatService({required this.secureStorage}) {
-  }
+  ChatService({required this.secureStorage});
 
   Future<void> connect() async {
     if (_isConnecting) {
@@ -23,8 +26,8 @@ class ChatService {
     _isConnecting = true; // Set flag
     print("Setting _isConnecting to true"); // Log for debugging
 
-    String? username = await secureStorage.getUsername();
-    String? token = await secureStorage.getToken();
+    username = await secureStorage.getUsername();
+    token = await secureStorage.getToken();
     String url = '$chatBaseURL/ChatHub?userId=$username&access_token=$token';
     print(url);
 
@@ -135,6 +138,11 @@ class ChatService {
     _hubConnection.invoke('SendMessage', args: [message.sender, message.receiver, message.message]);
   }
 
+  void displayMessage(ChatMessageModel message) {
+    _hubConnection.invoke('DisplayMessage', args: [message.sender, message.receiver, message.message]);
+  }
+
+
   /// Registers a listener for incoming messages.
   void onMessageReceived(void Function(ChatMessageModel) callback) {
     _hubConnection.on('ReceiveMessage', (List<Object?>? args) {
@@ -143,6 +151,25 @@ class ChatService {
       final sender   = args[0] as String;
       final receiver = args[1] as String;
       final content  = args[2] as String;
+      final rawTime  = args[3] as String;
+      final time     = DateTime.parse(rawTime).toLocal();
+
+      callback(ChatMessageModel(
+        sender:   sender,
+        receiver: receiver,
+        message:  content,
+        time:     time,
+      ));
+    });
+  }
+
+  void onDisplayMessageReceived(void Function(ChatMessageModel) callback) {
+    _hubConnection.on('DisplayMessage', (List<Object?>? args) {
+      if (args == null || args.length < 4) throw Exception("Message received with wrong formatting");
+
+      final sender   = args[0] as String;
+      final receiver = args[1] as String;
+      final content = args[2] as String;
       final rawTime  = args[3] as String;
       final time     = DateTime.parse(rawTime).toLocal();
 

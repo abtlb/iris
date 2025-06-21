@@ -44,7 +44,7 @@ class MessageItem extends StatelessWidget {
           child: const CustomIconButton(
             size: 40,
             iconSize: 25,
-            background: kNotifyColor,
+            background: kInfoColor,
             icon: Icons.delete_rounded,
           ),
         ),
@@ -55,7 +55,7 @@ class MessageItem extends StatelessWidget {
           child: const CustomIconButton(
             size: 40,
             iconSize: 25,
-            background: kNotifyColor,
+            background: kInfoColor,
             icon: Icons.delete_rounded,
           ),
         ),
@@ -79,15 +79,19 @@ class MessageItem extends StatelessWidget {
               title: Text(
                 receiverId,
                 style: Styles.textStyle18.copyWith(
-                  fontWeight: FontWeight.w600,
-                  fontFamily: kCarosFont,
+                  fontWeight: FontWeight.w900,
+                  fontFamily: kFont,
+                  fontSize: 22,
                 ),
               ),
               subtitle: Text(
                 lastMessage,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: Styles.textStyle16,
+                style: Styles.textStyle16.copyWith(
+                  color: kTextLight,
+                  fontWeight: FontWeight.w400,
+                ),
               ),
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -95,22 +99,25 @@ class MessageItem extends StatelessWidget {
                 children: [
                   Text(
                     _formatMessageTime(lastMessageTime, DateTime.now()),
-                    style: Styles.textStyle16,
+                    style: Styles.textStyle16.copyWith(
+                      color: kTextLight,
+                      fontWeight: FontWeight.w400,
+                    ),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.videocam_rounded),
-                    color: Colors.blue,
-                    tooltip: 'Start Video Chat',
-                    onPressed: () {
-                      GoRouter.of(context).push(
-                        AppRoute.videoChatTestPath,
-                        extra: {
-                          'username1': senderId,
-                          'username2': receiverId,
-                        },
-                      );
-                    },
-                  ),
+                  // IconButton(
+                  //   icon: const Icon(Icons.videocam_rounded),
+                  //   color: Colors.blue,
+                  //   tooltip: 'Start Video Chat',
+                  //   onPressed: () {
+                  //     GoRouter.of(context).push(
+                  //       AppRoute.videoChatTestPath,
+                  //       extra: {
+                  //         'username1': senderId,
+                  //         'username2': receiverId,
+                  //       },
+                  //     );
+                  //   },
+                  // ),
                   notification(),
                 ],
               ),
@@ -152,7 +159,7 @@ class MessageItem extends StatelessWidget {
       height: 25,
       width: 25,
       decoration:
-      const BoxDecoration(color: kNotifyColor, shape: BoxShape.circle),
+      const BoxDecoration(color: kInfoColor, shape: BoxShape.circle),
       child: Center(
         child: Text('$notify', style: Styles.textStyle14),
       ),

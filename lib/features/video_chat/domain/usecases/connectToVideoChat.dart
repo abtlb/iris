@@ -13,6 +13,7 @@ class ConnectToVideoChatUsecase{
     await repository.setupLocalVideo();
     repository.setupEventHandlers();
     await repository.joinChannel(channel, uid);
+    await repository.disableLocalVideo();//disable local video sharing by default
 
     return engine;
   }

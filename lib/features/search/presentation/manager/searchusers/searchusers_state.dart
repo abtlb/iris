@@ -1,20 +1,5 @@
 part of 'searchusers_cubit.dart';
 
-// List<String> namesUser = [
-//   'Shane Haq',
-//   'Gualtiero Cea',
-//   'Maria Zarco',
-//   'Rosita Marcos',
-//   'Shane Haq',
-//   'Gualtiero Cea',
-//   'Maria Zarco',
-//   'Rosita Marcos',
-//   'Shane Haq',
-//   'Gualtiero Cea',
-//   'Maria Zarco',
-//   'Rosita Marcos',
-// ];
-
 @immutable
 abstract class SearchusersState {}
 
@@ -25,7 +10,7 @@ class SearchusersInitial extends SearchusersState {
 }
 
 class SearchusersFilter extends SearchusersState {
-  final List<ConversationEntity> filterNames;
+  final List<UserEntity> filterNames;
   final String senderId;
   // final String receiverId = 'receiverId'; // Assuming you have a receiverId
 

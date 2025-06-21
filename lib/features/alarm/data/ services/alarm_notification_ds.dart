@@ -25,7 +25,9 @@ class AlarmNotificationService{
       'alarm_channel', 'Alarms',
       channelDescription: 'Channel for scheduled alarms',
       importance: Importance.max,
-      priority: Priority.high,
+      largeIcon: DrawableResourceAndroidBitmap('@drawable/android12splash'),
+      icon: '@drawable/ic_stat_name',
+      priority: Priority.max,
       playSound: false,
       enableVibration: false,
     );

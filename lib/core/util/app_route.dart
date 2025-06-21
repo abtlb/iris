@@ -10,13 +10,16 @@ import 'package:untitled3/features/auth/presentation/pages/sign_up_screen.dart';
 import 'package:untitled3/features/auth/presentation/pages/welcome_screen.dart';
 import 'package:untitled3/features/chat/presentation/pages/chat_screen_testing.dart';
 import 'package:untitled3/features/chat/presentation/views/chat_view.dart';
+import 'package:untitled3/features/learning/domain/entities/course.dart';
 import 'package:untitled3/features/learning/presentation/pages/learning_home.dart';
 import 'package:untitled3/features/learning/presentation/pages/learning_start_screen.dart';
+import 'package:untitled3/features/sound_detection/presentation/pages/emergency_alert_page.dart';
 import 'package:untitled3/features/sound_detection/presentation/pages/sound_monitor_page.dart';
-import 'package:untitled3/features/video_chat/presentation/pages/HandTrackingWidget.dart';
-import 'package:untitled3/features/video_home/presentation/views/home_view.dart';
+import 'package:untitled3/features/video_chat/presentation/widgets/HandTrackingWidget.dart';
+import 'package:untitled3/features/auth/presentation/pages/home_view.dart';
 import 'package:untitled3/features/search/presentation/views/search_view.dart';
 import 'package:untitled3/features/video_chat/presentation/pages/VideoChatTest.dart';
+import 'package:untitled3/features/video_home/presentation/views/chat_home.dart';
 import 'package:untitled3/features/video_home/presentation/views/widgets/help_screen.dart';
 import 'package:untitled3/features/account/presentation/pages/account_page.dart';
 import 'package:untitled3/main.dart';
@@ -24,8 +27,11 @@ import 'package:untitled3/main.dart';
 import '../../features/alarm/domain/entities/alarm_entity.dart';
 import '../../features/alarm/presentation/pages/alarm_page.dart';
 import '../../features/alarm/presentation/pages/set_alarm_page.dart';
+import '../../features/learning/presentation/pages/course_detail_page.dart';
 import '../../features/sound_detection/presentation/pages/sound_alert_page.dart';
 import '../../features/video_home/presentation/views/widgets/TextMagnifierSpeakerScreen.dart';
+import '../../features/video_home/presentation/views/widgets/homView_body.dart';
+import '../transitions/page_transitions.dart';
 
 abstract class AppRoute {
   static String welcomePath = '/';
@@ -45,11 +51,12 @@ abstract class AppRoute {
   static String accountPath = '/account';
   static String magnifierPath = '/magnifier';
   static String learningHome = '/learningHome';
-  static String learningStart = '/learningStart';
+  static String courseDetail = '/course_detail';
   static String soundDetection = '/soundDetection';
   static String alarmPath = '/alarm';
   static String setAlarmPath = '/set_alarm';
   static String handTracking = '/handTracking';
+  static String emergencyAlarm = '/emergencyAlarm';
 
   static final navigatorKey = GlobalKey<NavigatorState>();
   static final RouteObserver<ModalRoute<void>> routeObserver = RouteObserver<ModalRoute<void>>();
@@ -59,9 +66,18 @@ abstract class AppRoute {
     observers: [routeObserver],
     navigatorKey: navigatorKey,
     routes: [
-      GoRoute(path: homePath, builder: (_, __) => const HomePage()),
+      GoRoute(path: homePath,
+        pageBuilder: (context, state) {
+          return AppTransitions.buildPageWithTransition(
+            context,
+            state,
+            HomeView(),
+            transitionType: TransitionType.scale,
+          );
+        },
+      ),
       GoRoute(path: welcomePath, builder: (_, __) => WelcomeScreen()),
-      GoRoute(path: chatHomePath, builder: (_, __) => const HomeView()),
+      GoRoute(path: chatHomePath, builder: (_, __) => const ChatHome()),
       GoRoute(path: kChatPath, builder: (context, state) {
         final extra = state.extra as Map<String, dynamic>;
         return ChatView(
@@ -70,8 +86,23 @@ abstract class AppRoute {
         );
       }),
       GoRoute(path: kSearchPath, builder: (_, __) => const SearchView()),
-      GoRoute(path: signInPath, builder: (_, __) => const SignInScreen()),
-      GoRoute(path: signUpPath, builder: (_, __) => const SignUpScreen()),
+      GoRoute(
+        path: signInPath,
+        pageBuilder: (context, state) => AppTransitions.buildPageWithTransition(
+          context,
+          state,
+          const SignInScreen(),
+          transitionType: TransitionType.slideAndFade,
+        ),
+      ),
+      GoRoute(path: signUpPath,
+        pageBuilder: (context, state) => AppTransitions.buildPageWithTransition(
+          context,
+          state,
+          const SignUpScreen(),
+          transitionType: TransitionType.slideAndFade,
+        ),
+      ),
       GoRoute(path: forgetPasswordPath, builder: (_, __) => const ForgotPasswordScreen()),
       GoRoute(path: chatTestPath, builder: (_, __) => const ChatTestScreen()),
       GoRoute(
@@ -89,18 +120,67 @@ abstract class AppRoute {
         final extra = state.extra as Map<String, dynamic>;
         return AccountPage(prevPath: extra['prevPath']);
       }),
-      GoRoute(path: learningHome, builder: (_, __) => const LearningHome()),
-      GoRoute(path: learningStart, builder: (_, __) => const LearningStartScreen()),
+      GoRoute(path: learningHome,
+          // builder: (_, __) => const LearningHome()
+        pageBuilder: (context, state) => AppTransitions.buildPageWithTransition(
+          context,
+          state,
+          const LearningHome(),
+          transitionType: TransitionType.slideAndFade,
+        ),
+      ),
+      GoRoute(path: courseDetail,
+          pageBuilder: (context, state) {
+        final extra = state.extra as Course;
+        // return CourseDetailPage(course: extra);
+        return AppTransitions.buildPageWithTransition(
+          context,
+          state,
+          CourseDetailPage(course: extra),
+          transitionType: TransitionType.scale,
+        );
+      }),
       GoRoute(
         path: magnifierPath,
-        builder: (_, __) => const TextMagnifierSpeakerScreen(),
+        // builder: (_, __) => const TextMagnifierSpeakerScreen(),
+        pageBuilder: (context, state) => AppTransitions.buildPageWithTransition(
+          context,
+          state,
+          const TextMagnifierSpeakerScreen(),
+          transitionType: TransitionType.slideAndFade,
+        ),
       ),
       // GoRoute(
       //   path: soundDetection,
       //   builder: (_, __) => const SoundMonitorPage(),
       // ),
-      GoRoute(path: soundDetection, builder: (_, __) =>  SoundAlertPage()),
-      GoRoute(path: alarmPath, builder: (_, __) => const AlarmPage()),
+      GoRoute(path: soundDetection,
+          // builder: (_, __) =>  SoundAlertPage()
+        pageBuilder: (context, state) => AppTransitions.buildPageWithTransition(
+          context,
+          state,
+          SoundAlertPage(),
+          transitionType: TransitionType.slideAndFade,
+        ),
+      ),
+      // GoRoute(path: soundDetection, builder: (_, __) =>  const SoundMonitorPage()),
+      GoRoute(path: alarmPath,
+          // builder: (_, __) => const AlarmPage()
+        pageBuilder: (context, state) => AppTransitions.buildPageWithTransition(
+          context,
+          state,
+          const AlarmPage(),
+          transitionType: TransitionType.slideAndFade,
+        ),
+      ),
+      GoRoute(path: emergencyAlarm, builder: (context, state) {
+        final extra = state.extra as Map<String, dynamic>;
+        return EmergencyAlertPage(
+          detectedSound: extra['detectedSound'],
+          confidenceLevel: extra['confidenceLevel'],
+        );
+  }),
+
       GoRoute(path: handTracking, builder: (_, __) => HandTrackingWidget()),
       GoRoute(
         path: AppRoute.setAlarmPath,

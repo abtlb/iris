@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:untitled3/features/account/domain/entities/update_account_entity.dart';
 import 'package:untitled3/features/account/domain/usecases/update_account.dart';
@@ -13,6 +14,8 @@ class AccountCubit extends Cubit<AccountState> {
   final GetUserUseCase getUserUseCase;
   final GetCurrentUserUsecase getCurrentUserUsecase;
   final UpdateAccountUseCase updateAccountUseCase;
+  final FlutterSecureStorage storage = const FlutterSecureStorage();
+
 
   AccountCubit({
     required this.updateProfileImageUseCase,
@@ -26,6 +29,7 @@ class AccountCubit extends Cubit<AccountState> {
 
     try {
       final updatedUser = await updateAccountUseCase.call(updateEntity);
+      await storage.write(key: 'firstName', value: updateEntity.firstName);
       emit(state.copyWith(
         firstName: updatedUser.firstName,
         lastName: updatedUser.lastName,

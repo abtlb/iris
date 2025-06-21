@@ -5,7 +5,7 @@ import 'package:untitled3/features/video_home/presentation/bloc/chat_home_events
 import 'package:untitled3/features/video_home/presentation/bloc/chat_home_states.dart';
 
 class ChatHomeBloc extends Bloc<ChatHomeEvent, ChatHomeState> {
-  final GetConversationUsecase getConversationUsecase;
+  final GetConversationsUsecase getConversationUsecase;
   final GetSenderIdUseCase getSenderIdUseCase;
 
   ChatHomeBloc({required this.getConversationUsecase, required this.getSenderIdUseCase}) : super(ChatHomeInitial()){
@@ -13,6 +13,7 @@ class ChatHomeBloc extends Bloc<ChatHomeEvent, ChatHomeState> {
       try {
         var conversations = await getConversationUsecase.call();
         var senderId = await getSenderIdUseCase();
+        conversations = conversations.where((c) => c.lastMessage != "").toList();
         emit(ChatHomeLoadingConversationsSuccessful(conversations: conversations, senderId: senderId));
       }
       catch(e)

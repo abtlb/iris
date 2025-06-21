@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:untitled3/core/constants/constants.dart';
 
 class CustomIconButton extends StatelessWidget {
   const CustomIconButton({
@@ -18,18 +19,18 @@ class CustomIconButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: size ?? 55,
-      width: size ?? 55,
+      height: size ?? 60,
+      width: size ?? 60,
       decoration: BoxDecoration(
         // add decoration properties if needed, like color or borderRadius
-        color: Colors.blue, // example color
+        color: kPrimaryColor, // example color
         shape: BoxShape.circle, // example shape
       ),
       child: IconButton(
         onPressed: onPressed,
         icon: Icon(
           icon,
-          size: iconSize ?? 30,
+          size: iconSize ?? 40,
           color: color ?? Colors.white,
         ),
       ),

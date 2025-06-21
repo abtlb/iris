@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
+import 'package:untitled3/core/constants/constants.dart';
+import 'package:untitled3/core/util/app_route.dart';
 import 'package:untitled3/features/auth/presentation/bloc/auth/sign_up/sign_up_bloc.dart';
 import 'package:untitled3/features/auth/presentation/bloc/auth/sign_up/sign_up_events.dart';
 import 'package:untitled3/features/auth/presentation/bloc/auth/sign_up/sign_up_states.dart';
@@ -134,157 +136,192 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
   }
 
+  InputDecoration _buildInputDecoration(String labelText) {
+    return InputDecoration(
+      labelText: labelText,
+      labelStyle: const TextStyle(color: kTextPrimary),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(30.0),
+        borderSide: const BorderSide(color: kTextPrimary, width: 1.0),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(30.0),
+        borderSide: const BorderSide(color: kBorderColor, width: 1.0),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(30.0),
+        borderSide: const BorderSide(color: kTextPrimary, width: 2.0),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(30.0),
+        borderSide: const BorderSide(color: kErrorColor, width: 1.0),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(30.0),
+        borderSide: const BorderSide(color: kErrorColor, width: 2.0),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final languageProvider = Provider.of<LanguageProvider>(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          languageProvider.translate('signUp'),
-          style: const TextStyle(fontSize: 30.0, color: Colors.blue),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.language),
-            onPressed: languageProvider.toggleLanguage,
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [kPrimaryColor, kBackgroundColor],
           ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              const SizedBox(height: 80),
-              const Text(
-                "SignChat",
-                style: TextStyle(
-                  fontSize: 40,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blue,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Row(
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.arrow_back, color: Colors.black),
+                      onPressed: () => GoRouter.of(context).pop(),
+                    ),
+                  ],
                 ),
-              ),
-              const SizedBox(height: 20),
-              TextField(
-                controller: _usernameController,
-                decoration: InputDecoration(
-                  labelText: languageProvider.translate('Username'),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30.0),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: _firstNameController,
-                decoration: InputDecoration(
-                  labelText: languageProvider.translate('First Name'),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30.0),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: _lastNameController,
-                decoration: InputDecoration(
-                  labelText: languageProvider.translate('Last Name'),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30.0),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: _emailController,
-                decoration: InputDecoration(
-                  labelText: languageProvider.translate('Email'),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30.0),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: _passwordController,
-                obscureText: true,
-                decoration: InputDecoration(
-                  labelText: languageProvider.translate('Password'),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30.0),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: _dateOfBirthController,
-                readOnly: true,
-                onTap: () => _selectDate(context),
-                decoration: const InputDecoration(
-                  labelText: 'Date of Birth',
-                  suffixIcon: Icon(Icons.calendar_today),
-                ),
-              ),
-              const SizedBox(height: 20),
-
-              if (_errorMessage != null) ...[
+                const SizedBox(height: 50),
                 Text(
-                  _errorMessage!,
-                  style: const TextStyle(color: Colors.red, fontSize: 16),
+                  "IRIS",
+                  style: TextStyle(
+                    fontSize: 40,
+                    fontWeight: FontWeight.bold,
+                    color: kTextLight,
+                    fontFamily: kFont,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  languageProvider.translate('signUpDescription') ?? 'Create your account',
+                  style: TextStyle(fontSize: 18, color: kTextLight),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 20),
+                TextField(
+                  controller: _usernameController,
+                  cursorColor: kTextPrimary,
+                  decoration: _buildInputDecoration(languageProvider.translate('Username')),
                 ),
                 const SizedBox(height: 10),
-              ],
-
-              BlocConsumer<SignUpBloc, SignUpState>(
-                listener: (context, state) {
-                  if (state is SignUpSuccess) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Sign-up successful")),
-                    );
-                    context.go('/signin');
-                  } else if (state is SignUpFailure) {
-                    setState(() {
-                      _errorMessage = state.message;
-                    });
-                  }
-                },
-                builder: (context, state) {
-                  if (state is SignUpLoading) {
-                    return const CircularProgressIndicator();
-                  }
-                  return ElevatedButton(
-                    onPressed: _signUp,
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 14),
-                      backgroundColor: Colors.blue,
-                    ),
-                    child: Text(
-                      languageProvider.translate('signUp'),
-                      style: const TextStyle(fontSize: 18, color: Colors.white),
-                    ),
-                  );
-                },
-              ),
-              const SizedBox(height: 10),
-              TextButton(
-                onPressed: () {
-                  context.go('/signin');
-                },
-                child: Text(
-                  languageProvider.translate('haveAccount'),
-                  style: const TextStyle(fontSize: 18, color: Colors.blue),
+                TextField(
+                  controller: _firstNameController,
+                  cursorColor: kTextPrimary,
+                  decoration: _buildInputDecoration(languageProvider.translate('First Name')),
                 ),
-              ),
-            ],
+                const SizedBox(height: 10),
+                TextField(
+                  controller: _lastNameController,
+                  cursorColor: kTextPrimary,
+                  decoration: _buildInputDecoration(languageProvider.translate('Last Name')),
+                ),
+                const SizedBox(height: 10),
+                TextField(
+                  controller: _emailController,
+                  cursorColor: kTextPrimary,
+                  decoration: _buildInputDecoration(languageProvider.translate('Email')),
+                ),
+                const SizedBox(height: 10),
+                TextField(
+                  controller: _passwordController,
+                  obscureText: true,
+                  cursorColor: kTextPrimary,
+                  decoration: _buildInputDecoration(languageProvider.translate('Password')),
+                ),
+                const SizedBox(height: 10),
+                TextField(
+                  controller: _dateOfBirthController,
+                  readOnly: true,
+                  cursorColor: kTextPrimary,
+                  onTap: () => _selectDate(context),
+                  decoration: InputDecoration(
+                    labelText: 'Date of Birth',
+                    labelStyle: const TextStyle(color: kTextPrimary),
+                    suffixIcon: Icon(Icons.calendar_today, color: kTextPrimary),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30.0),
+                      borderSide: const BorderSide(color: kTextPrimary, width: 1.0),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30.0),
+                      borderSide: const BorderSide(color: kBorderColor, width: 1.0),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30.0),
+                      borderSide: const BorderSide(color: kTextPrimary, width: 2.0),
+                    ),
+                    errorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30.0),
+                      borderSide: const BorderSide(color: kErrorColor, width: 1.0),
+                    ),
+                    focusedErrorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30.0),
+                      borderSide: const BorderSide(color: kErrorColor, width: 2.0),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                if (_errorMessage != null)
+                  Text(_errorMessage!, style: const TextStyle(color: kErrorColor)),
+                const SizedBox(height: 10),
+                BlocConsumer<SignUpBloc, SignUpState>(
+                  listener: (context, state) {
+                    if (state is SignUpSuccess) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("Account created successfully!"), backgroundColor: kSuccessColor),
+                      );
+                      context.push(AppRoute.signInPath);
+                    } else if (state is SignUpFailure) {
+                      setState(() {
+                        _errorMessage = state.message;
+                      });
+                    }
+                  },
+                  builder: (context, state) {
+                    if (state is SignUpLoading) {
+                      return const CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(kPrimaryColor),
+                        strokeWidth: 3.0,
+                        backgroundColor: kBackgroundColor,
+                      );
+                    }
+                    return ElevatedButton(
+                      onPressed: _signUp,
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 14),
+                        backgroundColor: kPrimaryColor,
+                      ),
+                      child: Text(
+                        languageProvider.translate('signUp'),
+                        style: const TextStyle(color: Colors.white, fontSize: 18),
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(height: 10),
+                TextButton(
+                  onPressed: () => context.push(AppRoute.signInPath),
+                  child: Text(
+                    languageProvider.translate('haveAccount'),
+                    style: const TextStyle(color: kTextPrimary),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 }
-
-
-
-
-

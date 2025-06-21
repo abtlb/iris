@@ -20,7 +20,7 @@ class LanguageProvider extends ChangeNotifier {
   String translate(String key) {
     final translations = {
       'en': {
-        'welcome': 'Welcome to SignChat',
+        'welcome': 'Welcome to IRIS',
         'tagline': 'Breaking communication barriers',
         'description': 'Connect, communicate, and share with the deaf and hard-of-hearing community',
         'signIn': 'Sign In',

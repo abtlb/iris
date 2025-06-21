@@ -7,12 +7,19 @@ import 'package:get_it/get_it.dart';
 import 'package:image/image.dart' as img;
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:go_router/go_router.dart';
+import 'package:untitled3/features/video_chat/data/repository/AgoraVideoChatRepository.dart';
+import 'package:untitled3/features/video_chat/domain/repository/VideoChatRepository.dart';
 import 'package:untitled3/features/video_chat/domain/usecases/getPredictionStream.dart';
-import 'package:untitled3/features/video_chat/presentation/bloc/video_chat_bloc.dart';
-import 'package:untitled3/features/video_chat/presentation/bloc/video_chat_events.dart';
-import 'package:untitled3/features/video_chat/presentation/bloc/video_chat_states.dart';
+import 'package:untitled3/features/video_chat/presentation/bloc/connection_bloc/video_chat_bloc.dart';
+import 'package:untitled3/features/video_chat/presentation/bloc/connection_bloc/video_chat_events.dart';
+import 'package:untitled3/features/video_chat/presentation/bloc/connection_bloc/video_chat_states.dart';
 import 'package:untitled3/core/util/app_route.dart';
+import '../../../chat/domain/entities/message.dart';
+import '../../../chat/domain/usecases/chat_usecase.dart';
 import '../../data/others/asl_detector.dart';
+import '../../services/ speech_to_text_service.dart';
+import '../bloc/remote_bloc/remote_states.dart';
+import '../widgets/FloatingHandTracking.dart';
 import '../widgets/LocalVideoWidget.dart';
 import '../widgets/RemoteVideoWidget.dart';
 import '../../domain/utils/channel_name_generator.dart';
@@ -28,8 +35,9 @@ class VideoChatTestPage extends StatefulWidget {
 }
 
 class _VideoChatTestPageState extends State<VideoChatTestPage> {
-  late final StreamSubscription<String> _predictionSub;
-  String _currentPrediction = '';
+  ChatUseCase chatUseCase = GetIt.instance<ChatUseCase>();
+  //todo remove
+  VideoChatRepository agoraVideoChatRepository = GetIt.instance<VideoChatRepository>();
 
   @override
   void initState() {
@@ -37,19 +45,10 @@ class _VideoChatTestPageState extends State<VideoChatTestPage> {
     context.read<VideoChatBloc>().add(VideoChatConnectionRequested(
       channelName: ChannelNameGenerator.makeChannelName(widget.username1, widget.username2),
     ));
-    _predictionSub = GetIt
-        .instance<GetPredictionStreamUsecase>()
-        .call()
-        .listen((prediction) {
-      setState(() {
-        _currentPrediction = prediction;
-      });
-    });
   }
 
   @override
   void dispose() {
-    unawaited(_predictionSub.cancel());
     super.dispose();
   }
 
@@ -78,7 +77,7 @@ class _VideoChatTestPageState extends State<VideoChatTestPage> {
 
               if (state is VideoChatShowRemoteUser) {
                 engine = state.engine;
-                remoteUid = state.remoteUid;
+                remoteUid = 0;
               } else if (state is VideoChatConnected) {
                 engine = state.engine;
               }
@@ -87,61 +86,59 @@ class _VideoChatTestPageState extends State<VideoChatTestPage> {
               return Stack(
                 children: [
                   // Remote video (if available)
-                  if (remoteUid != null)
-                    RemoteVideoWidget(
-                      engine: engine!,
-                      remoteUid: remoteUid!,
-                      channel: ChannelNameGenerator.makeChannelName(widget.username1, widget.username2),
-                    ),
+                  // if (remoteUid != null)
+                  //   RemoteVideoWidget(
+                  //     engine: engine!,
+                  //     remoteUid: remoteUid!,
+                  //     channel: ChannelNameGenerator.makeChannelName(widget.username1, widget.username2),
+                  //   ),
+                  //
+                  // // Local video preview
+                  // Positioned(
+                  //   top: 20,
+                  //   right: 20,
+                  //   width: 120,
+                  //   height: 160,
+                  //   child: LocalVideoWidget(engine: engine!),
+                  // ),
 
-                  // Local video preview
-                  Positioned(
-                    top: 20,
-                    right: 20,
-                    width: 120,
-                    height: 160,
-                    child: LocalVideoWidget(engine: engine!),
-                  ),
-
-                  // ASL Prediction Display
-                  Positioned(
-                    bottom: 100,
-                    left: 0,
-                    right: 0,
-                    child: Center(
-                      child: Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.7),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text(
-                          _currentPrediction,
-                          style: const TextStyle(
-                              fontSize: 32,
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ),
-                  ),
 
                   // End call button
-                  Positioned(
-                    bottom: 20,
-                    left: 0,
-                    right: 0,
-                    child: Center(
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red,
-                          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                        ),
-                        onPressed: () => context.read<VideoChatBloc>().add(VideoChatDisconnectRequested()),
-                        child: const Text("END CALL", style: TextStyle(color: Colors.white)),
-                      ),
-                    ),
-                  ),
+                  // Positioned(
+                  //   bottom: 20,
+                  //   left: 0,
+                  //   right: 0,
+                  //   child: Center(
+                  //     child: ElevatedButton(
+                  //       style: ElevatedButton.styleFrom(
+                  //         backgroundColor: Colors.red,
+                  //         padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                  //       ),
+                  //       onPressed: () => context.read<VideoChatBloc>().add(VideoChatDisconnectRequested()),
+                  //       child: const Text("END CALL", style: TextStyle(color: Colors.white)),
+                  //     ),
+                  //   ),
+                  // ),
+                  // Positioned(
+                  //   bottom: 20,
+                  //   left: 0,
+                  //   right: 0,
+                  //   child: Center(
+                  //     child: ElevatedButton(
+                  //       style: ElevatedButton.styleFrom(
+                  //         backgroundColor: Colors.red,
+                  //         padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                  //       ),
+                  //       onPressed: () async {
+                  //         await agoraVideoChatRepository.disableAudio();
+                  //         SpeechToTextService speechToTextService = SpeechToTextService();
+                  //         await speechToTextService.initialize();
+                  //         speechToTextService.startListening((result) => print(result));
+                  //       },
+                  //       child: const Text("TEST SPEECH", style: TextStyle(color: Colors.white)),
+                  //     ),
+                  //   ),
+                  // ),
                 ],
               );
             },

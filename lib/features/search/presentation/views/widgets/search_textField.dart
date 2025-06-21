@@ -19,7 +19,7 @@ class _SearchTextfieldState extends State<SearchTextfield> {
       textInputAction: TextInputAction.search,
       onChanged: widget.onChanged,
       showCursor: true,
-      cursorColor: kPrimarycolor,
+      cursorColor: kPrimaryColor,
       style: Styles.textStyle16.copyWith(
         fontWeight: FontWeight.w600,
         color: Colors.black,
@@ -27,18 +27,18 @@ class _SearchTextfieldState extends State<SearchTextfield> {
       decoration: InputDecoration(
         filled: true,
         fillColor: kContainerColor,
-        suffix: Padding(
-          padding: const EdgeInsets.only(top: 20),
-          child: IconButton(
-            onPressed: () {
-              controller.clear();
-            },
-            icon: const Icon(
-              Icons.clear_all_rounded,
-              color: Colors.black,
-            ),
-          ),
-        ),
+        // suffix: Padding(
+        //   padding: const EdgeInsets.only(top: 20),
+        //   child: IconButton(
+        //     onPressed: () {
+        //       controller.clear();
+        //     },
+        //     icon: const Icon(
+        //       Icons.clear_all_rounded,
+        //       color: Colors.black,
+        //     ),
+        //   ),
+        // ),
         prefixIcon: const Icon(
           Icons.search,
         ),
@@ -57,9 +57,9 @@ class _SearchTextfieldState extends State<SearchTextfield> {
         focusedErrorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(20),
             borderSide: BorderSide(color: kContainerColor)),
-        hintText: "Chat Search...",
+        hintText: "Search for someone to chat with...",
         hintStyle: Styles.textStyle16
-            .copyWith(fontWeight: FontWeight.w600, color: Colors.black),
+            .copyWith(fontWeight: FontWeight.w600, color: Colors.black, fontFamily: kFont, fontSize: 15),
         errorStyle: Styles.textStyle16.copyWith(
           fontWeight: FontWeight.w600,
         ),

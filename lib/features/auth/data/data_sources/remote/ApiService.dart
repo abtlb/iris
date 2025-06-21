@@ -7,6 +7,7 @@ import 'package:untitled3/features/auth/data/models/login_request.dart';
 import 'package:untitled3/features/auth/data/models/user.dart';
 import 'package:untitled3/features/auth/data/models/user_token.dart';
 
+import '../../../../../core/env.dart';
 import '../../models/register_request.dart';
 
 part 'ApiService.g.dart';

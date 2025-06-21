@@ -83,21 +83,9 @@ class _CustomDrawerState extends State<CustomDrawer> {
               });
             },
             child: const DrawerListileItem(
-              icon: Icon(FontAwesomeIcons.key, color: Colors.white, size: 22),
+              icon: Icon(FontAwesomeIcons.user, color: Colors.white, size: 22),
               title: 'Account',
             ),
-          ),
-          const DrawerListileItem(
-            icon: Icon(Icons.forum_rounded, color: Colors.white, size: 25),
-            title: 'Chats',
-          ),
-          const DrawerListileItem(
-            icon: Icon(Icons.notifications_active_rounded, color: Colors.white, size: 25),
-            title: 'Notifications',
-          ),
-          const DrawerListileItem(
-            icon: Icon(FontAwesomeIcons.database, color: Colors.white, size: 22),
-            title: 'Data and Storage',
           ),
           GestureDetector(
             onTap: () {
@@ -108,64 +96,10 @@ class _CustomDrawerState extends State<CustomDrawer> {
               title: 'Help',
             ),
           ),
-          GestureDetector(
-            onTap: () async {
-              final picker = ImagePicker();
-              final picked = await picker.pickImage(source: ImageSource.gallery);
-              if (picked != null) {
-                final File imageFile = File(picked.path);
-
-                final BuildContext currentContext = context;
-                // show a confirmation dialog with the image preview
-                final bool? confirmed = await showDialog<bool>(
-                  context: currentContext,
-                  builder: (_) => AlertDialog(
-                    title: const Text("Confirm Avatar"),
-                    content: Image.file(
-                      imageFile,
-                      width: 200,
-                      height: 200,
-                      fit: BoxFit.cover,
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.of(context).pop(false),
-                        child: const Text("Cancel"),
-                      ),
-                      ElevatedButton(
-                        onPressed: () => Navigator.of(context).pop(true),
-                        child: const Text("Confirm"),
-                      ),
-                    ],
-                  ),
-                );
-
-                var getIt = GetIt.instance;
-                var apiService = getIt<ApiService>(); //Todo: this is bad
-                await apiService.uploadAvatar(user?.username?? "", imageFile);
-
-
-                ScaffoldMessenger.of(currentContext).showSnackBar(
-                  const SnackBar(content: Text("Avatar uploaded! Reloading…")),
-                );
-                GoRouter.of(currentContext).push(AppRoute.chatHomePath
-                );
-              }
-
-    },
-            child: const DrawerListileItem(
-              icon: Icon(FontAwesomeIcons.solidCircleQuestion, color: Colors.white, size: 22),
-              title: 'Upload new profile picture',
-            ),
-          ),
           const SizedBox(height: 10),
           const Padding(
             padding: EdgeInsets.only(left: 5, right: 30),
-            child: Divider(color: kPrimarycolor, thickness: 2),
-          ),
-          const DrawerListileItem(
-            icon: Icon(Icons.people_outline_rounded, color: Colors.white, size: 25),
-            title: 'Invite a friend',
+            child: Divider(color: kPrimaryColor, thickness: 2),
           ),
           const Spacer(flex: 2),
           GestureDetector(

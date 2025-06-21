@@ -3,13 +3,15 @@ import 'dart:ui';
 
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
+import 'package:untitled3/core/services/local_notification_ds.dart';
 import 'package:untitled3/features/alarm/presentation/bloc/alarm_form/alarm_form_cubit.dart';
 import 'package:untitled3/features/alarm/presentation/bloc/alarm_list/alarm_list_cubit.dart';
 import 'package:untitled3/features/sound_detection/presentation/bloc/sound_monitor_cubit.dart';
 import 'package:untitled3/features/video_home/presentation/bloc/chat_home_bloc.dart';
-import 'package:untitled3/features/video_chat/presentation/bloc/video_chat_bloc.dart';
+import 'package:untitled3/features/video_chat/presentation/bloc/connection_bloc/video_chat_bloc.dart';
 import 'package:untitled3/injection_container.dart';
 import 'core/widgets/all_parent_widget.dart';
 import 'features/auth/presentation/bloc/auth/sign_in/sign_in_bloc.dart';
@@ -21,22 +23,16 @@ import 'package:untitled3/core/util/app_route.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
-// Create and register a port
-final ReceivePort alarmTriggeredPort = ReceivePort();
-final Stream<dynamic> alarmTriggeredBroadcast = alarmTriggeredPort.asBroadcastStream();
-
-
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await AndroidAlarmManager.initialize();
-
-  // Register the port so background isolates can look it up
-  IsolateNameServer.registerPortWithName(
-    alarmTriggeredPort.sendPort,
-    'alarm_ui_port',
+  // Hide system navigation bar
+  SystemChrome.setEnabledSystemUIMode(
+    SystemUiMode.immersiveSticky,
+    overlays: [SystemUiOverlay.top], // Keep status bar, hide navigation bar
   );
+
+  await AndroidAlarmManager.initialize();
 
   await initializeDependancies();
   final GetIt locator = GetIt.instance;
@@ -49,24 +45,14 @@ Future<void> main() async {
           BlocProvider<SignUpBloc>(
             create: (_) => locator<SignUpBloc>()
           ),
-          BlocProvider<ChatBloc>(
-            create: (_) => locator<ChatBloc>()
-          ),
           BlocProvider<ChatHomeBloc>(
               create: (_) => locator<ChatHomeBloc>()
-          ),
-          BlocProvider<VideoChatBloc>(
-              create: (_) => locator<VideoChatBloc>()
           ),
           BlocProvider<AlarmFormCubit>(
               create: (_) => locator<AlarmFormCubit>()
           ),
           BlocProvider<AlarmListCubit>(
               create: (_) => locator<AlarmListCubit>()
-          ),
-          // Add other BlocProviders here if needed.
-          BlocProvider<SoundMonitorCubit>(
-            create: (_) => locator<SoundMonitorCubit>()
           ),
           ChangeNotifierProvider<LanguageProvider>(
             create: (_) => LanguageProvider(),
@@ -79,6 +65,8 @@ Future<void> main() async {
 
   tz.initializeTimeZones();
   tz.setLocalLocation(tz.getLocation('Africa/Cairo'));
+
+
 }
 
 class MyApp extends StatelessWidget {

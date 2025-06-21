@@ -59,7 +59,9 @@ class AlarmRepositoryImpl implements AlarmRepository {
     if (alarm.repeatDays.isNotEmpty) {
       var nextTime = getNearestTime(alarm.time, alarm.repeatDays);
       alarm = alarm.copyWith(time: nextTime);
-      print("alarm timmeee: ${alarm.time.toString()}");
+    } else {
+      final nextTime = getNearestTime(alarm.time, WeekDayX.daysOfWeek);
+      alarm = alarm.copyWith(time: nextTime);
     }
 
     await notifications.scheduleAlarmNotification(
@@ -88,46 +90,40 @@ class AlarmRepositoryImpl implements AlarmRepository {
 
   @override
   Future<List<Alarm>> getAllAlarms() async {
-    // Load the stored AlarmModels
     final models = await localAlarmDataSource.loadAlarms();
     final now = DateTime.now();
     final List<Alarm> alarms = [];
+    final List<Alarm> alarmsToUpdate = [];
 
     for (var model in models) {
       final alarm = model.toDomain();
 
-      // If alarm is in the past, disable and reschedule date to next occurrence
       if (alarm.time.isBefore(now)) {
-        // Compute next date with same clock time, at least one day ahead
-        final candidate = DateTime(
-          now.year,
-          now.month,
-          now.day,
-          alarm.time.hour,
-          alarm.time.minute,
-        );
-        final nextTime = candidate.isAfter(now)
-            ? candidate
-            : candidate.add(const Duration(days: 1));
-
-        // Create a disabled Alarm with updated time
-        final updated = alarm.copyWith(
-          time: nextTime,
-          isEnabled: false,
-        );
-
-        // Persist changes and cancel any pending notification
-        await updateAlarm(updated);
-
-        alarms.add(updated);
+        if (alarm.repeatDays.isNotEmpty) {
+          // For repeating alarms, schedule next occurrence
+          final nextTime = getNearestTime(alarm.time, alarm.repeatDays);
+          final updated = alarm.copyWith(time: nextTime);
+          alarmsToUpdate.add(updated);
+          alarms.add(updated);
+        } else {
+          // For one-time alarms, disable them
+          // final updated = alarm.copyWith(isEnabled: false);
+          final nextTime = getNearestTime(alarm.time, WeekDayX.daysOfWeek);
+          final updated = alarm.copyWith(time: nextTime);
+          alarmsToUpdate.add(updated);
+          alarms.add(updated);
+        }
       } else {
         alarms.add(alarm);
       }
     }
 
-    // sorted by time
-    alarms.sort((a, b) => a.time.compareTo(b.time));
+    // Update alarms after iteration
+    for (var alarm in alarmsToUpdate) {
+      await updateAlarm(alarm);
+    }
 
+    alarms.sort((a, b) => a.time.compareTo(b.time));
     return alarms;
   }
 

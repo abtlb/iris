@@ -20,7 +20,7 @@ class CustomAppBarSearch extends StatelessWidget {
         children: [
           CustomIconButton(
             icon: Icons.arrow_back_ios_new_rounded,
-            color: kPrimarycolor,
+            color: kSecondaryColor,
             size: 45,
             iconSize: 18,
             onPressed: () {

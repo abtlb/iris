@@ -37,14 +37,6 @@ class CustomAppBar extends StatelessWidget {
                 ),
               ],
             ),
-            // MENU BUTTON (modified to blue color)
-            CustomIconButton(
-              icon: Icons.account_circle_rounded,
-              color: Colors.white, // <-- Set the color to blue
-              onPressed: () {
-                Scaffold.of(context).openEndDrawer();
-              },
-            ),
           ],
         ),
       ),

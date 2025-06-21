@@ -36,7 +36,7 @@ class _LearningStartScreenState extends State<LearningStartScreen> {
             child: IconButton(
               icon: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 30),
               onPressed: () {
-                GoRouter.of(context).go(AppRoute.chatHomePath);
+                GoRouter.of(context).pop();
               },
             ),
           ),
@@ -73,7 +73,7 @@ class _LearningStartScreenState extends State<LearningStartScreen> {
                   SizedBox(height: height * 0.01),
                   GestureDetector(
                     onTap: () {
-                      GoRouter.of(context).go('/learningHome'); // الانتقال إلى الصفحة المعنية
+                      GoRouter.of(context).push('/learningHome');
                     },
                     child: Container(
                       alignment: Alignment.center,

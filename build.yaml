@@ -1,0 +1,6 @@
+#targets:
+#  $default:
+#    builders:
+#      retrofit_generator|retrofit:
+#        generate_for:
+#          - lib/**_api.dart

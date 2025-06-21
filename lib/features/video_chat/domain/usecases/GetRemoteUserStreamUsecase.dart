@@ -7,6 +7,7 @@ class GetRemoteUserStreamUsecase {
 
   Stream<int?> call() {
     // This returns a stream of remote user IDs (or null when no remote user is present)
+    print("remote user usecase called");
     return repository.remoteUserStream;
   }
 }

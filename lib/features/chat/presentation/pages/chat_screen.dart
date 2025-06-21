@@ -20,8 +20,8 @@ class ChatPage extends StatefulWidget {
 
 class _ChatPageState extends State<ChatPage> {
   late TextEditingController _messageController;
-  late List<ChatMessageEntity> _messages = <ChatMessageEntity>[];
   late ChatBloc _chatBloc;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -35,6 +35,7 @@ class _ChatPageState extends State<ChatPage> {
   @override
   void dispose() {
     _messageController.dispose();
+    _scrollController.dispose();
     _chatBloc.add(ChatDisconnect());
     super.dispose();
   }
@@ -53,6 +54,18 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
 
+  void _scrollToBottom() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -65,62 +78,131 @@ class _ChatPageState extends State<ChatPage> {
                 if (state is ChatLoading) {
                   return const Center(child: CircularProgressIndicator());
                 } else if (state is ChatMessagesLoadingSuccess) {
+                  // Auto-scroll to bottom when messages load
+                  _scrollToBottom();
+
                   return ListView.builder(
-                    itemCount: _messages.length,
+                    controller: _scrollController,
+                    itemCount: state.messages.length,
                     itemBuilder: (context, index) {
-                      final msg = _messages[index];
-                      return ListTile(
-                        title: Text(msg.message),
-                        subtitle: Text("From: ${msg.sender} at ${msg.time}"),
+                      final msg = ChatMessageEntity.fromModel(state.messages[index]);
+                      final isMyMessage = msg.sender == widget.senderId;
+
+                      return Container(
+                        margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                        child: Align(
+                          alignment: isMyMessage ? Alignment.centerRight : Alignment.centerLeft,
+                          child: Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: isMyMessage ? Colors.blue[100] : Colors.grey[200],
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  msg.message,
+                                  style: const TextStyle(fontSize: 16),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  "${msg.time.hour}:${msg.time.minute.toString().padLeft(2, '0')}",
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
                       );
                     },
                   );
+                } else if (state is ChatAddingMessage) {
+                  // Show loading indicator while sending
+                  return const Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CircularProgressIndicator(),
+                        SizedBox(height: 16),
+                        Text("Sending message..."),
+                      ],
+                    ),
+                  );
                 } else if (state is ChatMessagesLoadingFailure) {
-                  return Center(child: Text("Error loading the messages: ${state.error}"));
-                }
-                else if (state is ChatUpdating) {
-                  return ListView.builder(
-                    itemCount: _messages.length,
-                    itemBuilder: (context, index) {
-                      final ChatMessageEntity msg = _messages[index];
-                      return ListTile(
-                        title: Text(msg.message),
-                        subtitle: Text("From: ${msg.sender} at ${msg.time}"),
-                      );
-                    },
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text("Error loading messages: ${state.error}"),
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          onPressed: () {
+                            _chatBloc.add(ChatLoadMessages(
+                                sender: widget.senderId,
+                                receiver: widget.receiverId
+                            ));
+                          },
+                          child: const Text("Retry"),
+                        ),
+                      ],
+                    ),
                   );
                 }
                 return const Center(child: Text("No messages yet"));
               },
               listener: (context, state) {
-                if(state is ChatMessagesLoadingSuccess) {
-                  for (var model in state.messages) {
-                    _messages.add(ChatMessageEntity.fromModel(model));
-                  }
-                } else if(state is ChatAddingMessage) {
-                    _messages.add(state.message);
-                    _chatBloc.add(ChatUpdateMessages());
-                    print(_messages);
-                  }
+                if (state is ChatMessagesLoadingFailure) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text("Failed to send message: ${state.error}"),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
               },
             ),
           ),
-          Padding(
+          Container(
             padding: const EdgeInsets.all(8.0),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  offset: const Offset(0, -2),
+                  blurRadius: 4,
+                  color: Colors.black.withOpacity(0.1),
+                ),
+              ],
+            ),
             child: Row(
               children: [
                 Expanded(
                   child: TextField(
                     controller: _messageController,
                     decoration: const InputDecoration(
-                      labelText: "Enter your message",
+                      hintText: "Type a asd...",
                       border: OutlineInputBorder(),
+                      contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     ),
+                    onSubmitted: (_) => _sendMessage(),
                   ),
                 ),
-                IconButton(
-                  onPressed: _sendMessage,
-                  icon: const Icon(Icons.send),
+                const SizedBox(width: 8),
+                BlocBuilder<ChatBloc, ChatState>(
+                  builder: (context, state) {
+                    return IconButton(
+                      onPressed: state is ChatAddingMessage ? null : _sendMessage,
+                      icon: Icon(
+                        Icons.send,
+                        color: state is ChatAddingMessage ? Colors.grey : Colors.blue,
+                      ),
+                    );
+                  },
                 ),
               ],
             ),

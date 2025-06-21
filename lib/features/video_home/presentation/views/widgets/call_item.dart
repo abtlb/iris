@@ -32,7 +32,7 @@ final String name ;
                 onPressed: () {},
                 icon: const Icon(
                   FontAwesomeIcons.phoneFlip,
-                  color: kPrimarycolor,
+                  color: kPrimaryColor,
                   size: 20,
                 )),
           ),

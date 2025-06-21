@@ -24,6 +24,14 @@ android {
         jvmTarget = "1.8"
     }
 
+    packagingOptions {
+        pickFirst '**/libmediapipe_jni.so'
+        pickFirst '**/libopencv_java3.so'
+        pickFirst '**/libc++_shared.so'
+        pickFirst '**/libtensorflowlite_jni.so'
+        pickFirst '**/libtensorflowlite_gpu_jni.so'
+    }
+
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.example.untitled3"
@@ -39,7 +47,17 @@ android {
         release {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.debug
+//            signingConfig = signingConfigs.debug
+//            minifyEnabled true
+//            shrinkResources true
+//            debuggable true
+            minifyEnabled false
+            shrinkResources false
+            signingConfig signingConfigs.debug
+//            minifyEnabled true        // Keep obfuscation
+//            shrinkResources true     // Keep size optimization
+//            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+//            signingConfig signingConfigs.debug  // Add this line
         }
     }
 }
@@ -56,11 +74,19 @@ dependencies {
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
     implementation files('libs/classes.jar')
     implementation 'com.google.protobuf:protobuf-javalite:4.31.0'
+    implementation 'io.gitlab.rxp90:jsymspell:1.0'
     implementation 'com.google.flogger:flogger:0.7.4'
     implementation 'com.google.flogger:flogger-system-backend:0.7.4'
     implementation 'com.google.guava:guava:31.1-android'
-    implementation "androidx.camera:camera-core:1.0.0-alpha06"
-    implementation "androidx.camera:camera-camera2:1.0.0-alpha06"
+    implementation "androidx.camera:camera-core:1.1.0"
+    implementation "androidx.camera:camera-camera2:1.1.0"
+    implementation "androidx.camera:camera-lifecycle:1.1.0"
+    implementation "androidx.camera:camera-view:1.1.0"
+    // Core CameraX APIs
+//    implementation "androidx.camera:camera-core:1.0.0-alpha06"
+//    implementation "androidx.camera:camera-camera2:1.0.0-alpha06"
+//    implementation "androidx.camera:camera-lifecycle:1.1.0"
+
 }
 
 flutter {

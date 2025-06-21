@@ -51,7 +51,7 @@ class SearchViewBody extends StatelessWidget {
                 padding: const EdgeInsets.only(left: 20, bottom: 60, right: 20),
                 sliver: AllUsersListview(
                   senderId: state.senderId,
-                  receiverId: state.filterNames.toString(),
+                  receiverIds: state.filterNames.map((n) => n.username!).toList(),
                   names: state.filterNames,
                 ),
               );

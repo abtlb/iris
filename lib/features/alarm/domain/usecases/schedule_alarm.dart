@@ -6,7 +6,7 @@ class ScheduleAlarm {
 
   ScheduleAlarm({required this.alarmRepository});
 
-  void call(Alarm alarm) {
-    alarmRepository.scheduleAlarm(alarm);
+  Future<void> call(Alarm alarm) async {
+    await alarmRepository.scheduleAlarm(alarm);
   }
 }

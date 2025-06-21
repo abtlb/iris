@@ -6,6 +6,7 @@ import 'package:retrofit/retrofit.dart';
 import 'package:untitled3/features/auth/data/models/user.dart';
 
 import '../../../../core/constants/constants.dart';
+import '../../../../core/env.dart';
 import '../models/update_account_model.dart';
 
 part 'updateAccountService.g.dart';

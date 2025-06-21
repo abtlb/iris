@@ -20,44 +20,106 @@ class ChatContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final now = DateTime.now();
-    final isCurrentUser = senderId == currentUserId;
+    final width = MediaQuery.of(context).size.width;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 6),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          Text(
-            isCurrentUser ? 'You' : senderId,
-            style: Styles.textStyle14.copyWith(
-              color: Colors.grey[600],
-              fontWeight: FontWeight.bold,
+          SizedBox(width: width / 3), // Space to keep right alignment
+
+          // Message bubble
+          Flexible(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        kPrimaryColor,
+                        kPrimaryColor.withOpacity(0.8),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20),
+                      bottomLeft: Radius.circular(20),
+                      bottomRight: Radius.circular(4),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: kPrimaryColor.withOpacity(0.3),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Text(
+                    text,
+                    style: Styles.textStyle16.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w500,
+                      height: 1.3,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        formatDateTime(time, now),
+                        style: Styles.textStyle16.copyWith(
+                          color: Colors.grey[500],
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      // Read status indicator
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(width: 12),
+
+          // Current user avatar
           Container(
-            padding: const EdgeInsets.all(15),
+            width: 32,
+            height: 32,
             decoration: BoxDecoration(
-              color: kContainerColor,
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(25),
-                topRight: Radius.circular(25),
-                bottomRight: Radius.circular(25),
+              shape: BoxShape.circle,
+              gradient: LinearGradient(
+                colors: [
+                  kPrimaryColor,
+                  kPrimaryColor.withOpacity(0.7),
+                ],
               ),
+              boxShadow: [
+                BoxShadow(
+                  color: kPrimaryColor.withOpacity(0.3),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
-            child: Text(
-              text,
-              style: Styles.textStyle16.copyWith(
-                color: Colors.black,
-                fontWeight: FontWeight.w600,
+            child: Center(
+              child: Text(
+                currentUserId.substring(0, 1).toUpperCase(),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                ),
               ),
-            ),
-          ),
-          const SizedBox(height: 5),
-          Text(
-            formatDateTime(time, now),
-            style: Styles.textStyle14.copyWith(
-              color: Colors.grey,
             ),
           ),
         ],
@@ -65,8 +127,3 @@ class ChatContainer extends StatelessWidget {
     );
   }
 }
-
-
-
-
-

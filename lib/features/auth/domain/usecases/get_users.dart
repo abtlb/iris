@@ -13,5 +13,4 @@ GetUsersUseCase(this.userRepository);
   Future<DataState<List<UserEntity>>> call({params}) {
     return userRepository.getUsers();
   }
-
 }

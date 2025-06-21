@@ -19,4 +19,11 @@ class SecureStorage {
     return await storage.read(key: "username");
   }
 
+  Future<void> saveFirstName(String firstName) async {
+    await storage.write(key: "firstName", value: firstName);
+  }
+
+  Future<String?> getFirstName() async {
+    return await storage.read(key: "firstName");
+  }
 }

@@ -53,15 +53,16 @@ class FrameObserver {
 
   /// Your entry point for processing
   void receiveFrame(VideoSourceType videoSourceType, VideoFrame frame){
-    if (_frameCount++ % 10 != 0) {
-      return;
-    }
-    final rgbImage = yuv420ToImage(frame);
-    // unawaited(_processCameraFrame(rgbImage));
-    var landmarks = hands.predict(rgbImage);
-    if (landmarks != null) {
-      aslDetector.predict(landmarks);
-    }
+    //todo delete this
+    // if (_frameCount++ % 10 != 0) {
+    //   return;
+    // }
+    // final rgbImage = yuv420ToImage(frame);
+    // // unawaited(_processCameraFrame(rgbImage));
+    // var landmarks = hands.predict(rgbImage);
+    // if (landmarks != null) {
+    //   aslDetector.predict(landmarks);
+    // }
   }
 
   Stream<String> getPredictionStream() => aslDetector.predictionStream;

@@ -3,276 +3,370 @@ import 'dart:async';
 import 'dart:typed_data';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:record/record.dart';
+import 'package:untitled3/core/services/local_notification_ds.dart';
 import 'package:untitled3/features/sound_detection/data/data_sources/sound_local_datasource.dart';
+import 'package:untitled3/features/sound_detection/domain/entities/sound_detection_settings.dart';
 import 'package:untitled3/features/sound_detection/domain/repositories/sound_repository.dart';
 
 import '../../domain/entities/classification_result.dart';
 import '../models/sound_classifier_model.dart';
 
 class SoundRepositoryImpl implements SoundRepository {
+  static const int _sampleRate = 16000;
+  static const int _bytesPerSample = 2;
+  static const Duration _maxRecordingDuration = Duration(minutes: 30);
+  static const Duration _restartDelay = Duration(milliseconds: 500);
+
   final SoundClassifier soundClassifier;
   final SoundLocalDataSource localDataSource;
+  final LocalNotificationDataSource localNotificationDataSource;
 
-  final AudioRecorder _audioRecorder = AudioRecorder(); // Handles microphone recording
-  StreamController<List<ClassificationResult>>? _classificationController; // Stream to output results
-  bool _isRecording = false; // Internal state flag
-  List<int> _audioBuffer = []; // Buffer to accumulate audio bytes until a chunk is ready
+  AudioRecorder? _audioRecorder;
+  StreamController<List<ClassificationResult>>? _classificationController;
+  StreamSubscription<Uint8List>? _audioStreamSubscription;
+  Timer? _maxDurationTimer;
+  Timer? _restartTimer;
 
-  // Constructor takes the dependencies required for this implementation
-  SoundRepositoryImpl(this.localDataSource,  this.soundClassifier);
+  bool _isRecording = false;
+  bool _isDisposed = false;
+  bool _shouldRestart = false;
+  List<int> _audioBuffer = [];
+  int _restartAttempts = 0;
+  static const int _maxRestartAttempts = 3;
+
+  int get _expectedChunkSize => SoundClassifier.requiredInputSamples * _bytesPerSample;
+
+  SoundRepositoryImpl(this.localDataSource, this.soundClassifier, this.localNotificationDataSource);
 
   @override
-  Stream<List<ClassificationResult>> detectSoundEvents(){
-
-    if(_classificationController != null) return _classificationController!.stream;
-
-    _classificationController = StreamController.broadcast();
-    startClassification();
-    return _classificationController!.stream;
-
-    // if (_isRecording) {
-    //   // Already recording, return the existing stream
-    //   // Or you could throw an error depending on desired behavior
-    //   print("2");
-    //   print("Classification already started.");
-    //   yield* _classificationController!.stream;
-    //   return;
-    // }
-    //
-    // // 1. Request Permission using the injected service
-    // print("3");
-    // final hasPermission = await requestMicrophonePermission();
-    // print("4");
-    // if (!hasPermission) {
-    //   print("Microphone permission denied. Cannot start classification.");
-    //   // You might want to yield an error into the stream or throw an exception
-    //   throw Exception("Microphone permission denied.");
-    //   // Alternatively, return an empty stream:
-    //   // yield* const Stream<List<ClassificationResult>>.empty();
-    //   // return;
-    // }
-    //
-    // // 2. Ensure the SoundClassifier model is loaded
-    // // It's good practice to load it before starting the stream
-    // print("5");
-    // try {
-    //   print("6");
-    //   await soundClassifier.loadModel();
-    //   print("7");
-    // } catch (e) {
-    //   print("Failed to load TFLite model: $e");
-    //   throw Exception("Failed to load sound classification model.");
-    // }
-    //
-    // // 3. Set up the stream controller
-    // print("8");
-    // _classificationController = StreamController<List<ClassificationResult>>.broadcast(); // Use broadcast if multiple listeners are possible
-    // _isRecording = true;
-    // _audioBuffer = []; // Clear buffer on start
-    //
-    // print("9");
-    // // Yield the stream immediately so the caller can start listening
-    // yield* _classificationController!.stream;
-    // print("10");
-    //
-    // // 4. Start Audio Recording Stream
-    // // Configure audio recording to match YAMNet's requirements (16kHz, mono, 16-bit PCM)
-    // final requiredBytesPerChunk = SoundClassifier.requiredInputSamples; // 2 bytes per sample for 16-bit PCM
-    //
-    // print("11");
-    // try {
-    //   print("12");
-    //   final stream = await _audioRecorder.startStream(
-    //     RecordConfig(
-    //       encoder: AudioEncoder.pcm16bits, // 16-bit PCM
-    //       sampleRate: SoundClassifier.requiredInputSamples, // 16kHz
-    //       numChannels: 1,                 // Mono
-    //     ),
-    //   );
-    //   print("12");
-    //
-    //   // 5. Listen to Audio Stream, Buffer, and Process Chunks
-    //   stream.listen(
-    //         (audioChunkBytes) {
-    //           if (!_isRecording || _classificationController!.isClosed) {
-    //         // Stop processing if recording is stopped or controller is closed
-    //         return;
-    //       }
-    //       _audioBuffer.addAll(audioChunkBytes);
-    //
-    //       // Process buffer in chunks of the required size
-    //       while (_audioBuffer.length >= requiredBytesPerChunk) {
-    //         // Extract a chunk of the exact required size
-    //         final chunkToClassify = Uint8List.fromList(_audioBuffer.sublist(0, requiredBytesPerChunk));
-    //
-    //         // Remove the processed chunk from the buffer
-    //         _audioBuffer.removeRange(0, requiredBytesPerChunk);
-    //
-    //         // Classify the chunk asynchronously using the SoundClassifier
-    //         // Use .then() or async/await within the listen callback carefully
-    //         // to avoid blocking the stream. processing should be fast or offloaded.
-    //         soundClassifier.runInference(chunkToClassify).then((rawResults) {
-    //           if (!_classificationController!.isClosed) {
-    //             // Map raw results (List<Map>) to Domain entities (List<ClassificationResult>)
-    //             final classificationResults = rawResults.map((r) =>
-    //                 ClassificationResult(
-    //                   category: r['category'] as String,
-    //                   confidence: r['confidence'] as double,
-    //                 )
-    //             ).toList();
-    //
-    //             // Add the results to the stream
-    //             _classificationController!.add(classificationResults);
-    //           }
-    //
-    //         }).catchError((error) {
-    //           // Handle errors during classification
-    //           print('Error classifying chunk: $error');
-    //           if (!_classificationController!.isClosed) {
-    //             _classificationController!.addError(error);
-    //           }
-    //         });
-    //       }
-    //     },
-    //     onError: (error) {
-    //       print('Audio stream error: $error');
-    //       if (!_classificationController!.isClosed) {
-    //         _classificationController!.addError(error);
-    //       }
-    //       stopContinuousClassification(); // Attempt to stop cleanly on stream error
-    //     },
-    //     onDone: () {
-    //       print('Audio stream done.');
-    //       stopContinuousClassification(); // Stop when the audio stream naturally ends (unlikely for mic)
-    //     },
-    //   );
-    //
-    // } catch (e) {
-    //   // Handle errors starting the audio stream itself
-    //   print('Error starting audio stream: $e');
-    //   if (_classificationController != null && !_classificationController!.isClosed) {
-    //     _classificationController!.addError(e);
-    //   }
-    //   stopContinuousClassification(); // Attempt to stop cleanly
-    //   throw e; // Rethrow for the caller (e.g., Use Case) to handle
-    // }
-    //
-    // // The async* function yields the stream and then the listener runs
-    // // in the background, adding events to the stream.
+  Future<void> showNotification(String message) async {
+    await localNotificationDataSource.show(id: 100000, title: "Sound detection triggered", body: message);
   }
 
-  Future<void> startClassification() async {
-    if (_isRecording) return;
-    _isRecording = true;
-
-    // 1) Permission
-    if (!await requestMicrophonePermission()) {
-      _classificationController!.addError("Microphone permission denied");
-      stopContinuousClassification(); return;
+  @override
+  Stream<List<ClassificationResult>> detectSoundEvents() {
+    if (_isDisposed) {
+      throw StateError('Repository has been disposed');
     }
 
-    // 2) Load model
+    // Return existing stream if available
+    if (_classificationController != null && !_classificationController!.isClosed) {
+      return _classificationController!.stream;
+    }
+
+    _initializeStream();
+    return _classificationController!.stream;
+  }
+
+  void _initializeStream() {
+    _classificationController?.close();
+    _classificationController = StreamController<List<ClassificationResult>>.broadcast(
+      onListen: () => _handleStreamListen(),
+      onCancel: () => _handleStreamCancel(),
+    );
+  }
+
+  void _handleStreamListen() {
+    print('Stream listener added - starting classification');
+    _startClassificationSafely();
+  }
+
+  void _handleStreamCancel() {
+    print('All stream listeners cancelled - stopping classification');
+    _shouldRestart = false;
+    _stopRecordingImmediately();
+  }
+
+  void _startClassificationSafely() async {
+    if (_isRecording || _isDisposed) return;
+
+    try {
+      await _ensurePermissions();
+      await _loadModelSafely();
+      await _startRecording();
+    } catch (e) {
+      print('Failed to start classification: $e');
+      _addError('Classification failed to start: $e');
+      _scheduleRestart();
+    }
+  }
+
+  Future<void> _ensurePermissions() async {
+    final status = await Permission.microphone.status;
+    if (!status.isGranted) {
+      final requested = await Permission.microphone.request();
+      if (!requested.isGranted) {
+        throw Exception('Microphone permission required');
+      }
+    }
+  }
+
+  Future<void> _loadModelSafely() async {
     try {
       await soundClassifier.loadModel();
+      _logModelInfo();
     } catch (e) {
-      _classificationController!.addError("Model load failed: $e");
-      stopContinuousClassification(); return;
+      throw Exception('Model loading failed: $e');
     }
+  }
 
-    // 3) Start recorder
-    final chunkBytes = SoundClassifier.requiredInputSamples * 2;
+  void _logModelInfo() {
+    final samples = SoundClassifier.requiredInputSamples;
+    final bytes = _expectedChunkSize;
+    final duration = samples / _sampleRate;
+
+    print('Audio Model Configuration:');
+    print('  Samples: $samples');
+    print('  Bytes: $bytes');
+    print('  Duration: ${duration.toStringAsFixed(3)}s');
+    print('  Sample Rate: $_sampleRate Hz');
+  }
+
+  Future<void> _startRecording() async {
+    await _stopRecordingCleanly(); // Ensure clean state
+
+    _audioRecorder = AudioRecorder();
+    _isRecording = true;
+    _audioBuffer.clear();
+
     try {
-      final audioStream = await _audioRecorder.startStream(
+      final stream = await _audioRecorder!.startStream(
         RecordConfig(
           encoder: AudioEncoder.pcm16bits,
-          sampleRate: SoundClassifier.requiredInputSamples,
+          sampleRate: _sampleRate,
           numChannels: 1,
+          autoGain: false,
+          echoCancel: false,
+          noiseSuppress: false,
         ),
       );
 
-      audioStream.listen((bytes) => _processChunk(bytes, chunkBytes),
-          onError: (e) { _classificationController!.addError(e); stopContinuousClassification(); },
-          onDone: stopContinuousClassification);
+      _audioStreamSubscription = stream.listen(
+        _processAudioData,
+        onError: _handleAudioError,
+        onDone: _handleAudioDone,
+        cancelOnError: false, // Don't auto-cancel on error
+      );
+
+      _setMaxDurationTimer();
+      _restartAttempts = 0; // Reset restart attempts on successful start
+      print('Audio recording started successfully');
+
     } catch (e) {
-      _classificationController!.addError("Recorder start failed: $e");
-      stopContinuousClassification();
+      _isRecording = false;
+      throw Exception('Failed to start audio stream: $e');
     }
   }
 
-  void _processChunk(Uint8List bytes, int chunkSize) {
-    if (!_isRecording) return;
-    _audioBuffer.addAll(bytes);
-    while (_audioBuffer.length >= chunkSize) {
-      final chunk = Uint8List.fromList(_audioBuffer.sublist(0, chunkSize));
-      _audioBuffer.removeRange(0, chunkSize);
-      soundClassifier.runInference(chunk).then((raw) {
-        final results = raw.map((r) =>
-            ClassificationResult(category: r['category'], confidence: r['confidence'])
-        ).toList();
-        _classificationController?.add(results);
-      }).catchError((e) => _classificationController?.addError(e));
+  void _processAudioData(Uint8List data) {
+    if (!_isRecording || _isDisposed) return;
+
+    try {
+      _audioBuffer.addAll(data);
+
+      while (_audioBuffer.length >= _expectedChunkSize) {
+        final chunk = Uint8List.fromList(_audioBuffer.sublist(0, _expectedChunkSize));
+        _audioBuffer.removeRange(0, _expectedChunkSize);
+
+        _classifyChunk(chunk);
+      }
+    } catch (e) {
+      print('Audio processing error: $e');
+      _handleAudioError(e);
     }
   }
 
+  void _classifyChunk(Uint8List chunk) async {
+    if (_isDisposed) return;
 
+    try {
+      final rawResults = await soundClassifier.runInference(chunk);
+      if (_isDisposed || _classificationController == null) return;
+
+      final results = rawResults
+          .map((r) => ClassificationResult(
+        category: r['category'] as String,
+        confidence: (r['confidence'] as num).toDouble(),
+      ))
+          .where((r) => r.confidence > 0.15)
+          .toList();
+
+      if (results.isNotEmpty && !_classificationController!.isClosed) {
+        _classificationController!.add(results);
+      }
+    } catch (e) {
+      print('Classification error: $e');
+      // Don't restart on classification errors, just log them
+    }
+  }
+
+  void _handleAudioError(dynamic error) {
+    print('Audio stream error: $error');
+    _addError('Audio error: $error');
+    _scheduleRestart();
+  }
+
+  void _handleAudioDone() {
+    print('Audio stream completed unexpectedly');
+    _scheduleRestart();
+  }
+
+  void _setMaxDurationTimer() {
+    _maxDurationTimer?.cancel();
+    _maxDurationTimer = Timer(_maxRecordingDuration, () {
+      print('Maximum recording duration reached - restarting');
+      _scheduleRestart();
+    });
+  }
+
+  void _scheduleRestart() {
+    if (_isDisposed || !_shouldRestart) return;
+    if (_restartAttempts >= _maxRestartAttempts) {
+      print('Maximum restart attempts reached - stopping');
+      _addError('Audio system became unstable - stopping detection');
+      return;
+    }
+
+    _restartAttempts++;
+    print('Scheduling restart attempt $_restartAttempts/$_maxRestartAttempts');
+
+    _stopRecordingImmediately();
+
+    _restartTimer?.cancel();
+    _restartTimer = Timer(_restartDelay, () {
+      if (!_isDisposed && _shouldRestart) {
+        _startClassificationSafely();
+      }
+    });
+  }
+
+  void _stopRecordingImmediately() {
+    _isRecording = false;
+    _audioBuffer.clear();
+
+    _maxDurationTimer?.cancel();
+    _maxDurationTimer = null;
+
+    // Cancel subscription first (most important for preventing crashes)
+    _audioStreamSubscription?.cancel();
+    _audioStreamSubscription = null;
+
+    // Then stop recorder with error handling
+    _stopRecorderSafely();
+  }
+
+  void _stopRecorderSafely() async {
+    if (_audioRecorder == null) return;
+
+    try {
+      // Add a small delay to let the subscription cancel fully
+      await Future.delayed(Duration(milliseconds: 100));
+
+      if (await _audioRecorder!.isRecording()) {
+        await _audioRecorder!.stop();
+      }
+    } catch (e) {
+      print('Error stopping recorder (non-critical): $e');
+    } finally {
+      try {
+        _audioRecorder?.dispose();
+      } catch (e) {
+        print('Error disposing recorder (non-critical): $e');
+      }
+      _audioRecorder = null;
+    }
+  }
+
+  Future<void> _stopRecordingCleanly() async {
+    _shouldRestart = false;
+    _restartTimer?.cancel();
+    _restartTimer = null;
+
+    _stopRecordingImmediately();
+
+    // Wait a bit longer for clean shutdown
+    await Future.delayed(Duration(milliseconds: 200));
+  }
 
   @override
   Future<void> stopContinuousClassification() async {
-    if (!_isRecording) {
-      print("Classification not started, nothing to stop.");
-      return;
-    }
-    _isRecording = false;
-    _audioBuffer = []; // Clear any remaining buffered data
+    print('Stopping continuous classification');
+    await _stopRecordingCleanly();
 
-    // Stop the audio recorder
     try {
-      if (await _audioRecorder.isRecording()) { // Check if it's actually recording
-        await _audioRecorder.stop();
-        print("Audio recording stopped.");
+      if (_classificationController != null && !_classificationController!.isClosed) {
+        await _classificationController!.close();
       }
     } catch (e) {
-      print("Error stopping audio recorder: $e");
-      // Continue stopping other resources
+      print('Error closing controller: $e');
+    } finally {
+      _classificationController = null;
     }
-
-
-    // Close the stream controller
-    if (_classificationController != null && !_classificationController!.isClosed) {
-      try {
-        await _classificationController!.close();
-        print("Classification stream controller closed.");
-      } catch (e) {
-        print("Error closing classification stream controller: $e");
-      }
-    }
-    _classificationController = null; // Clear the controller reference
-
-
-    // Optionally dispose the sound classifier if its lifecycle is tied to the repository
-    // This depends on how you manage dependencies. If the repository is a singleton
-    // for the app lifecycle, you might dispose the classifier in a higher-level dispose method.
-    // _soundClassifier.dispose();
   }
 
-  // Add a dispose method to the repository itself for cleanup when the repository instance is no longer needed
-  void dispose() {
-    print("Disposing SoundRecognitionRepositoryImpl");
-    stopContinuousClassification(); // Ensure recording and stream are stopped
-    soundClassifier.dispose(); // Dispose the classifier when the repository is disposed
-    // No need to dispose _audioRecorder here, the 'record' package documentation
-    // suggests stop() is sufficient cleanup for streams started with startStream.
-    // Check the specific library's documentation for final confirmation.
+  void _addError(String error) {
+    try {
+      if (!_isDisposed &&
+          _classificationController != null &&
+          !_classificationController!.isClosed) {
+        _classificationController!.addError(error);
+      }
+    } catch (e) {
+      print('Failed to add error to stream: $e');
+    }
+  }
+
+  @override
+  Future<void> dispose() async {
+    if (_isDisposed) return;
+
+    print('Disposing SoundRepositoryImpl');
+    _isDisposed = true;
+    _shouldRestart = false;
+
+    await _stopRecordingCleanly();
+
+    try {
+      _classificationController?.close();
+      _classificationController = null;
+    } catch (e) {
+      print('Error disposing controller: $e');
+    }
+
+    try {
+      soundClassifier.dispose();
+    } catch (e) {
+      print('Error disposing classifier: $e');
+    }
   }
 
   @override
   Stream<double> getDecibelStream() {
+    if (_isDisposed) throw StateError('Repository disposed');
     return localDataSource.decibelStream();
   }
 
   @override
   Future<bool> requestMicrophonePermission() async {
-    var status = await Permission.microphone.request();
+    final status = await Permission.microphone.request();
     return status == PermissionStatus.granted;
   }
+
+  @override
+  Future<SoundDetectionSettings> getSettings() async {
+    if (_isDisposed) throw StateError('Repository disposed');
+    return await localDataSource.getSettings();
+  }
+
+  @override
+  Future<void> saveSettings(SoundDetectionSettings settings) async {
+    if (_isDisposed) throw StateError('Repository disposed');
+    await localDataSource.saveSettings(settings);
+  }
+
+  // Status getters
+  bool get isRecording => _isRecording;
+  bool get isDisposed => _isDisposed;
+  int get bufferSize => _audioBuffer.length;
+  int get restartAttempts => _restartAttempts;
 }

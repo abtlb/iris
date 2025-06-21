@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:go_router/go_router.dart'; // أضف هذا
+import 'package:go_router/go_router.dart';
 import 'package:untitled3/core/util/app_route.dart';
+import 'package:untitled3/core/constants/constants.dart';
+import 'package:untitled3/core/util/styles.dart';
 
 class TextMagnifierSpeakerScreen extends StatefulWidget {
   const TextMagnifierSpeakerScreen({super.key});
@@ -15,6 +17,7 @@ class _TextMagnifierSpeakerScreenState extends State<TextMagnifierSpeakerScreen>
   final TextEditingController _textController = TextEditingController();
   final TextEditingController _phraseController = TextEditingController();
   final FlutterTts _flutterTts = FlutterTts();
+  final ScrollController _scrollController = ScrollController();
   List<String> _savedPhrases = [];
   bool _isMagnifierTab = true;
 
@@ -63,60 +66,127 @@ class _TextMagnifierSpeakerScreenState extends State<TextMagnifierSpeakerScreen>
 
   void _magnifyText() {
     setState(() {});
+    // Scroll to bottom to show the magnified text
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeInOut,
+        );
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFE5F0FF),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFFE5F0FF),
-        elevation: 0,
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.indigo),
-          onPressed: () {
-            GoRouter.of(context).go(AppRoute.chatHomePath);// أو context.go(AppRoute.home) لو معرف المسار في AppRoute
-          },
-        ),
-        title: const Text(
-          'Text Magnifier & Speaker',
-          style: TextStyle(
-            fontSize: 26,
-            fontWeight: FontWeight.bold,
-            color: Colors.indigo,
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [kPrimaryColor, kBackgroundColor],
           ),
         ),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const SizedBox(height: 20),
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(30),
-              ),
-              padding: const EdgeInsets.all(5),
-              child: Row(
+        child: CustomScrollView(
+          controller: _scrollController,
+          physics: const BouncingScrollPhysics(),
+          slivers: [
+            SliverToBoxAdapter(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildTabButton('Magnifier', _isMagnifierTab, () {
-                    setState(() {
-                      _isMagnifierTab = true;
-                    });
-                  }),
-                  _buildTabButton('Saved Phrases', !_isMagnifierTab, () {
-                    setState(() {
-                      _isMagnifierTab = false;
-                    });
-                  }),
+                  // Header Section matching home page design
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.1),
+                      borderRadius: const BorderRadius.only(
+                        bottomLeft: Radius.circular(30),
+                        bottomRight: Radius.circular(30),
+                      ),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                          top: 50, left: 30, right: 30, bottom: 20),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              // BACK BUTTON with white color for better contrast
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(50),
+                                ),
+                                child: IconButton(
+                                  icon: const Icon(Icons.arrow_back,
+                                      color: kTextLight),
+                                  onPressed: () {
+                                    GoRouter.of(context).pop();
+                                  },
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              // TITLE with light color
+                              Text(
+                                'Text Magnifier\n& Speaker',
+                                style: Styles.textStyle30.copyWith(
+                                  color: kTextLight,
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: kFont,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  // Tab Section
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 20),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(30),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.3),
+                          width: 1,
+                        ),
+                      ),
+                      padding: const EdgeInsets.all(5),
+                      child: Row(
+                        children: [
+                          _buildTabButton('Magnifier', _isMagnifierTab, () {
+                            setState(() {
+                              _isMagnifierTab = true;
+                            });
+                          }),
+                          _buildTabButton('Saved Phrases', !_isMagnifierTab, () {
+                            setState(() {
+                              _isMagnifierTab = false;
+                            });
+                          }),
+                        ],
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
-            const SizedBox(height: 20),
-            _isMagnifierTab ? _buildMagnifierTab() : _buildSavedPhrasesTab(),
+            SliverFillRemaining(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: _isMagnifierTab ? _buildMagnifierTab() : _buildSavedPhrasesTab(),
+              ),
+            ),
           ],
         ),
       ),
@@ -130,16 +200,17 @@ class _TextMagnifierSpeakerScreenState extends State<TextMagnifierSpeakerScreen>
         child: Container(
           height: 50,
           decoration: BoxDecoration(
-            color: isActive ? Colors.white : Colors.transparent,
+            color: isActive ? Colors.white.withOpacity(0.9) : Colors.transparent,
             borderRadius: BorderRadius.circular(25),
           ),
           alignment: Alignment.center,
           child: Text(
             label,
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: isActive ? Colors.indigo : Colors.black54,
+              color: isActive ? kPrimaryColor : kTextLight,
+              fontFamily: kFont,
             ),
           ),
         ),
@@ -149,168 +220,233 @@ class _TextMagnifierSpeakerScreenState extends State<TextMagnifierSpeakerScreen>
 
   Widget _buildMagnifierTab() {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Row(
-          children: [
-            Expanded(
-              flex: 3,
-              child: _buildTextField(_textController, 'Enter text...'),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              flex: 1,
-              child: _buildSmallButton(
-                icon: Icons.search,
-                onPressed: _magnifyText,
-              ),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              flex: 1,
-              child: _buildSmallButton(
-                icon: Icons.volume_up,
-                onPressed: () => _speak(_textController.text),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 20),
+        // Input and control buttons section
         Container(
-          padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Colors.white.withOpacity(0.15),
             borderRadius: BorderRadius.circular(20),
-            boxShadow: const [
-              BoxShadow(
-                color: Colors.black12,
-                blurRadius: 6,
-                offset: Offset(0, 3),
+            border: Border.all(
+              color: Colors.white.withOpacity(0.3),
+              width: 1,
+            ),
+          ),
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              _buildTextField(_textController, 'Enter text to magnify...'),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildActionButton(
+                      icon: Icons.search,
+                      label: 'Magnify',
+                      onPressed: _magnifyText,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _buildActionButton(
+                      icon: Icons.volume_up,
+                      label: 'Speak',
+                      onPressed: () => _speak(_textController.text),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
-          child: Center(
-            child: ShaderMask(
-              shaderCallback: (bounds) => const LinearGradient(
-                colors: [Colors.indigo, Colors.lightBlueAccent],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ).createShader(bounds),
-              child: Text(
-                _textController.text,
-                style: const TextStyle(
-                  fontSize: 100,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+        ),
+
+        const SizedBox(height: 20),
+
+        // Magnified text display - takes maximum available space
+        Expanded(
+          child: Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.95),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: Colors.white.withOpacity(0.5),
+                width: 2,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 10,
+                  offset: const Offset(0, 5),
                 ),
-                textAlign: TextAlign.center,
+              ],
+            ),
+            child: Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(20),
+                child: ShaderMask(
+                  shaderCallback: (bounds) => const LinearGradient(
+                    colors: [kPrimaryColor, kBlueLight],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ).createShader(bounds),
+                  child: Text(
+                    _textController.text.isEmpty
+                        ? 'Type text above to see it magnified here...'
+                        : _textController.text,
+                    style: TextStyle(
+                      fontSize: _textController.text.isEmpty ? 24 : _calculateFontSize(),
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      fontFamily: kFont,
+                      height: 1.2,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
               ),
             ),
           ),
         ),
+        const SizedBox(height: 20),
       ],
     );
+  }
+
+
+  double _calculateFontSize() {
+    final textLength = _textController.text.length;
+    if (textLength <= 10) return 120;
+    if (textLength <= 20) return 80;
+    if (textLength <= 50) return 60;
+    if (textLength <= 100) return 50;
+    return 24;
+    // return mapValue(textLength.toDouble(), 0, 100, 60, 24);
   }
 
   Widget _buildSavedPhrasesTab() {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        _buildTextField(_phraseController, 'Add a new phrase...'),
-        const SizedBox(height: 10),
-        SizedBox(
-          width: double.infinity,
-          child: _buildButton(
-            label: 'Save Phrase',
-            icon: Icons.add,
-            onPressed: _savePhrase,
+        // Add phrase section
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.15),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: Colors.white.withOpacity(0.3),
+              width: 1,
+            ),
+          ),
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              _buildTextField(_phraseController, 'Add a new phrase...'),
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                child: _buildActionButton(
+                  label: 'Save Phrase',
+                  icon: Icons.add,
+                  onPressed: _savePhrase,
+                ),
+              ),
+            ],
           ),
         ),
-        const SizedBox(height: 10),
-        ..._savedPhrases.asMap().entries.map((entry) {
-          final index = entry.key;
-          final phrase = entry.value;
-          return Container(
-            margin: const EdgeInsets.symmetric(vertical: 5),
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(15),
-              boxShadow: const [
-                BoxShadow(
-                  color: Colors.black12,
-                  blurRadius: 4,
-                  offset: Offset(0, 2),
-                ),
-              ],
+
+        const SizedBox(height: 20),
+
+        // Saved phrases list
+        Expanded(
+          child: _savedPhrases.isEmpty
+              ? Center(
+            child: Text(
+              'No saved phrases yet.\nAdd one above to get started!',
+              style: TextStyle(
+                fontSize: 18,
+                color: kTextLight,
+                fontFamily: kFont,
+              ),
+              textAlign: TextAlign.center,
             ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    phrase,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
+          )
+              : ListView.builder(
+            itemCount: _savedPhrases.length,
+            itemBuilder: (context, index) {
+              final phrase = _savedPhrases[index];
+              return Container(
+                margin: const EdgeInsets.only(bottom: 12),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(15),
+                  border: Border.all(
+                    color: Colors.white.withOpacity(0.3),
+                    width: 1,
                   ),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.volume_up, color: Colors.indigo),
-                  onPressed: () => _speak(phrase),
+                child: ListTile(
+                  contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16, vertical: 8),
+                  title: Text(
+                    phrase,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: kTextLight,
+                      fontFamily: kFont,
+                    ),
+                  ),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.volume_up, color: kTextLight),
+                        onPressed: () => _speak(phrase),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.copy, color: kTextLight),
+                        onPressed: () {
+                          _textController.text = phrase;
+                          setState(() {
+                            _isMagnifierTab = true;
+                          });
+                        },
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.delete, color: kTextLight),
+                        onPressed: () => _deletePhrase(index),
+                      ),
+                    ],
+                  ),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.copy, color: Colors.indigo),
-                  onPressed: () {
-                    _textController.text = phrase;
-                  },
-                ),
-                IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.indigo),
-                  onPressed: () => _deletePhrase(index),
-                ),
-              ],
-            ),
-          );
-        }),
+              );
+            },
+          ),
+        ),
       ],
     );
   }
 
-  Widget _buildButton({required String label, required IconData icon, required VoidCallback onPressed}) {
+  Widget _buildActionButton({required String label, required IconData icon, required VoidCallback onPressed}) {
     return ElevatedButton.icon(
       style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.indigo,
+        backgroundColor: Colors.white.withOpacity(0.9),
+        foregroundColor: kPrimaryColor,
         padding: const EdgeInsets.symmetric(vertical: 14),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(15),
         ),
+        elevation: 0,
       ),
-      icon: Icon(icon, size: 24, color: Colors.white),
+      icon: Icon(icon, size: 20),
       label: Text(
         label,
-        style: const TextStyle(
-          fontSize: 18,
+        style: TextStyle(
+          fontSize: 16,
           fontWeight: FontWeight.bold,
-          color: Colors.white,
+          fontFamily: kFont,
         ),
       ),
       onPressed: onPressed,
-    );
-  }
-
-  Widget _buildSmallButton({required IconData icon, required VoidCallback onPressed}) {
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.indigo,
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15),
-        ),
-      ),
-      onPressed: onPressed,
-      child: Icon(icon, size: 24, color: Colors.white),
     );
   }
 
@@ -319,27 +455,40 @@ class _TextMagnifierSpeakerScreenState extends State<TextMagnifierSpeakerScreen>
       controller: controller,
       decoration: InputDecoration(
         hintText: hint,
+        hintStyle: TextStyle(
+          color: kTextLight.withOpacity(0.7),
+          fontFamily: kFont,
+        ),
         filled: true,
-        fillColor: Colors.white,
+        fillColor: Colors.white.withOpacity(0.2),
         contentPadding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
-          borderSide: BorderSide.none,
+          borderSide: BorderSide(
+            color: Colors.white.withOpacity(0.3),
+            width: 1,
+          ),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: BorderSide(
+            color: Colors.white.withOpacity(0.3),
+            width: 1,
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: const BorderSide(
+            color: kTextLight,
+            width: 2,
+          ),
         ),
       ),
-      style: const TextStyle(fontSize: 18),
+      style: TextStyle(
+        fontSize: 16,
+        color: kTextLight,
+        fontFamily: kFont,
+      ),
     );
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-

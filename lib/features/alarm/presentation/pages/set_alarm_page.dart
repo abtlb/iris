@@ -1,643 +1,684 @@
-// import 'package:flutter/material.dart';
-//
-// class SetAlarmPage extends StatefulWidget {
-//   const SetAlarmPage({super.key});
-//
-//   @override
-//   State<SetAlarmPage> createState() => _SetAlarmPageState();
-// }
-//
-// class _SetAlarmPageState extends State<SetAlarmPage> {
-//   final List<String> allDays = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
-//   Set<String> selectedDays = {'Mo', 'Tu', 'We', 'Th', 'Fr'};
-//
-//   int hour = 6;
-//   int minute = 0;
-//   bool isAm = true;
-//
-//   double alarmVolume = 0.7;
-//   bool vibrationEnabled = true;
-//   String vibrationStrength = 'Medium';
-//   bool useFlashlight = false;
-//   bool showPopup = true;
-//   String alarmNote = '';
-//
-//   void incrementHour() => setState(() => hour = (hour + 1) % 24);
-//   void decrementHour() => setState(() => hour = (hour - 1 + 24) % 24);
-//   void incrementMinute() => setState(() => minute = (minute + 1) % 60);
-//   void decrementMinute() => setState(() => minute = (minute - 1 + 60) % 60);
-//
-//   String formatTimeUnit(int unit) => unit.toString().padLeft(2, '0');
-//   String displayHour12(int hour) {
-//     final h = hour % 12;
-//     return (h == 0 ? 12 : h).toString().padLeft(2, '0');
-//   }
-//
-//   int getFinalHour() {
-//     final base = hour % 12;
-//     return isAm ? base : base + 12;
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       backgroundColor: Colors.indigo,
-//       appBar: AppBar(
-//         backgroundColor: Colors.transparent,
-//         elevation: 0,
-//         title: const Text('Alarm',
-//             style: TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold)),
-//         leading: const BackButton(color: Colors.white),
-//         centerTitle: true,
-//       ),
-//       body: ListView(
-//         padding: const EdgeInsets.all(16),
-//         children: [
-//           _buildCard([
-//             Row(
-//               mainAxisAlignment: MainAxisAlignment.center,
-//               children: [
-//                 _TimeAdjustButton(
-//                   value: displayHour12(hour),
-//                   onIncrement: () => setState(() => hour = (hour + 1) % 24),
-//                   onDecrement: () => setState(() => hour = (hour - 1 + 24) % 24),
-//                 ),
-//                 const SizedBox(width: 10),
-//                 const Text(":", style: TextStyle(fontSize: 38, fontWeight: FontWeight.bold)),
-//                 const SizedBox(width: 10),
-//                 _TimeAdjustButton(
-//                   value: formatTimeUnit(minute),
-//                   onIncrement: incrementMinute,
-//                   onDecrement: decrementMinute,
-//                 ),
-//                 const SizedBox(width: 10),
-//                 Column(
-//                   children: [
-//                     GestureDetector(
-//                       onTap: () => setState(() => isAm = true),
-//                       child: Text(
-//                         "AM",
-//                         style: TextStyle(
-//                           fontSize: 18,
-//                           fontWeight: FontWeight.bold,
-//                           color: isAm ? Colors.indigo[700] : Colors.grey,
-//                         ),
-//                       ),
-//                     ),
-//                     const SizedBox(height: 4),
-//                     GestureDetector(
-//                       onTap: () => setState(() => isAm = false),
-//                       child: Text(
-//                         "PM",
-//                         style: TextStyle(
-//                           fontSize: 18,
-//                           fontWeight: FontWeight.bold,
-//                           color: !isAm ? Colors.indigo[700] : Colors.grey,
-//                         ),
-//                       ),
-//                     ),
-//                   ],
-//                 )
-//               ],
-//             ),
-//           ]),
-//           const SizedBox(height: 16),
-//
-//           // Repeat section
-//           _buildCard([
-//             _sectionHeader(Icons.calendar_today, "Repeat"),
-//             const SizedBox(height: 12),
-//             Wrap(
-//               spacing: 8,
-//               runSpacing: 8,
-//               children: allDays.map((d) {
-//                 final selected = selectedDays.contains(d);
-//                 return GestureDetector(
-//                   onTap: () {
-//                     setState(() {
-//                       if (selected) {
-//                         selectedDays.remove(d);
-//                       } else {
-//                         selectedDays.add(d);
-//                       }
-//                     });
-//                   },
-//                   child: Chip(
-//                     label: Text(d),
-//                     backgroundColor: selected ? Colors.indigo[700] : Colors.grey[300],
-//                     labelStyle: TextStyle(
-//                       color: selected ? Colors.white : Colors.black,
-//                       fontWeight: FontWeight.bold,
-//                     ),
-//                   ),
-//                 );
-//               }).toList(),
-//             )
-//           ]),
-//           const SizedBox(height: 16),
-//
-//           // Alarm Sound and Volume
-//           _buildCard([
-//             _sectionHeader(Icons.notifications_none, "Alarm sound"),
-//             const SizedBox(height: 8),
-//             const Text("Alarm tone: Alarm Ringtone",
-//                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-//             Slider(
-//               value: alarmVolume,
-//               onChanged: (value) => setState(() => alarmVolume = value),
-//               activeColor: Colors.indigo[900],
-//               inactiveColor: Colors.indigo[100],
-//             ),
-//           ]),
-//           const SizedBox(height: 16),
-//
-//           // Note
-//           _buildCard([
-//             _sectionHeader(Icons.note_alt_outlined, "Note"),
-//             const SizedBox(height: 8),
-//             TextField(
-//               decoration: const InputDecoration(
-//                 hintText: "Add a note for this alarm",
-//                 border: OutlineInputBorder(),
-//               ),
-//               onChanged: (val) => setState(() => alarmNote = val),
-//             ),
-//           ]),
-//           const SizedBox(height: 16),
-//
-//           // Vibration
-//           _buildCard([
-//             Row(
-//               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//               children: [
-//                 const Row(
-//                   children: [
-//                     Icon(Icons.vibration),
-//                     SizedBox(width: 8),
-//                     Text("Vibration", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-//                   ],
-//                 ),
-//                 Switch(
-//                   value: vibrationEnabled,
-//                   onChanged: (val) => setState(() => vibrationEnabled = val),
-//                   activeColor: Colors.indigo[700],
-//                 ),
-//               ],
-//             ),
-//             const SizedBox(height: 12),
-//             _dropdownField("Strength", vibrationStrength, ["Low", "Medium", "High"],
-//                 enabled: vibrationEnabled),
-//           ]),
-//           const SizedBox(height: 16),
-//
-//           // Flashlight + Popup
-//           _buildCard([
-//             SwitchListTile(
-//               value: useFlashlight,
-//               onChanged: (val) => setState(() => useFlashlight = val),
-//               title: const Text("Use flashlight", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-//               secondary: const Icon(Icons.flashlight_on),
-//               activeColor: Colors.indigo[700],
-//             ),
-//             SwitchListTile(
-//               value: showPopup,
-//               onChanged: (val) => setState(() => showPopup = val),
-//               title: const Text("Show on-screen popup", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-//               secondary: const Icon(Icons.alarm),
-//               activeColor: Colors.indigo[700],
-//             ),
-//           ]),
-//           const SizedBox(height: 90),
-//         ],
-//       ),
-//       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-//       floatingActionButton: SizedBox(
-//         height: 72,
-//         width: 72,
-//         child: FloatingActionButton(
-//           backgroundColor: Colors.indigo[700],
-//           child: const Icon(Icons.check, size: 36 , color: Colors.white),
-//           onPressed: () {
-//             final int finalHour = getFinalHour();
-//             final String timeString = '${formatTimeUnit(finalHour)}:${formatTimeUnit(minute)}';
-//             final Map<String, dynamic> newAlarm = {
-//               "time": timeString,
-//               "label": alarmNote,
-//               "days": selectedDays.toList(),
-//               "active": true,
-//             };
-//             Navigator.of(context).pop(newAlarm);
-//           },
-//         ),
-//       ),
-//     );
-//   }
-//
-//   Widget _buildCard(List<Widget> children) {
-//     return Container(
-//       padding: const EdgeInsets.all(16),
-//       decoration: BoxDecoration(
-//         color: Colors.white,
-//         borderRadius: BorderRadius.circular(16),
-//       ),
-//       child: Column(
-//         crossAxisAlignment: CrossAxisAlignment.start,
-//         children: children,
-//       ),
-//     );
-//   }
-//
-//   static Widget _sectionHeader(IconData icon, String title) => Row(
-//     children: [
-//       Icon(icon),
-//       const SizedBox(width: 8),
-//       Text(title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-//     ],
-//   );
-//
-//   static Widget _dropdownField(String label, String value, List<String> items, {bool enabled = true}) {
-//     return DropdownButtonFormField<String>(
-//       value: value,
-//       items: items.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
-//       onChanged: enabled ? (_) {} : null,
-//       decoration: InputDecoration(
-//         labelText: label,
-//         border: const OutlineInputBorder(),
-//         labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-//       ),
-//     );
-//   }
-// }
-//
-// class _TimeAdjustButton extends StatelessWidget {
-//   final String value;
-//   final VoidCallback onIncrement;
-//   final VoidCallback onDecrement;
-//
-//   const _TimeAdjustButton({
-//     required this.value,
-//     required this.onIncrement,
-//     required this.onDecrement,
-//   });
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Column(
-//       children: [
-//         IconButton(icon: const Icon(Icons.add, color: Colors.indigo), onPressed: onIncrement),
-//         Text(value, style: const TextStyle(fontSize: 38, fontWeight: FontWeight.bold)),
-//         IconButton(icon: const Icon(Icons.remove, color: Colors.indigo), onPressed: onDecrement),
-//       ],
-//     );
-//   }
-// }
-//
-
-//---My version---
-// import 'package:flutter/cupertino.dart';
-// import 'package:flutter/material.dart';
-// import 'package:flutter_bloc/flutter_bloc.dart';
-// import 'package:intl/intl.dart';
-// import 'package:untitled3/core/constants/constants.dart';
-// import 'package:untitled3/features/alarm/domain/entities/week_day.dart';
-// import '../bloc/alarm_form/alarm_form_cubit.dart';
-// import '../bloc/alarm_form/alarm_form_state.dart';
-//
-// class SetAlarmPage extends StatelessWidget {
-//   const SetAlarmPage({Key? key}) : super(key: key);
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return BlocProvider(
-//       create: (_) => AlarmFormCubit(),
-//       child: Scaffold(
-//         appBar: AppBar(
-//           backgroundColor: Colors.deepPurple,
-//           title: const Text('Set Alarm'),
-//           centerTitle: true,
-//         ),
-//         body: BlocBuilder<AlarmFormCubit, AlarmFormState>(
-//           builder: (context, state) {
-//             final alarm = state.alarm;
-//             return Padding(
-//               padding: const EdgeInsets.all(16),
-//               child: Column(
-//                 children: [
-//                   // Time Picker
-//                   Card(
-//                     elevation: 4,
-//                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-//                     child: ListTile(
-//                       title: Text(DateFormat('hh:mm a').format(alarm.time),
-//                           style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
-//                       trailing: const Icon(Icons.access_time, color: Colors.deepPurple),
-//                       onTap: () async {
-//                         final t = await showTimePicker(
-//                             context: context, initialTime: TimeOfDay.fromDateTime(alarm.time));
-//                         if (t != null) context.read<AlarmFormCubit>().updateTime(alarm.time);
-//                       },
-//                     ),
-//                   ),
-//                   const SizedBox(height: 16),
-//                   // Repeat Days using ChoiceChips
-//                   Card(
-//                     elevation: 4,
-//                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-//                     child: Padding(
-//                       padding: const EdgeInsets.all(12),
-//                       child: Wrap(
-//                         spacing: 8,
-//                         children: WeekDay.values.map((day) {
-//                           final selected = alarm.repeatDays.contains(day);
-//                           print("Is selected???? $selected");
-//                           return ChoiceChip(
-//                             label: Text(day.shortName),
-//                             selected: selected,
-//                             selectedColor: Colors.deepPurple,
-//                             onSelected: (_) {
-//                               // Copy the existing List<WeekDay>
-//                               final newDays = List<WeekDay>.from(alarm.repeatDays);
-//                               if (selected) {
-//                                 newDays.remove(day);
-//                               } else {
-//                                 newDays.add(day);
-//                               }
-//                               // Update with the new List<WeekDay>
-//                               context.read<AlarmFormCubit>().updateRepeat(newDays);
-//                             },
-//                           );
-//                         }).toList(),
-//                       ),
-//                     ),
-//                   ),
-//
-//                   const Spacer(),
-//                   ElevatedButton.icon(
-//                     style: ElevatedButton.styleFrom(
-//                       backgroundColor: kPrimarycolor,
-//                       padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
-//                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-//                     ),
-//                     icon: const Icon(Icons.check),
-//                     label: const Text('Save Alarm', style: TextStyle(fontSize: 18)),
-//                     onPressed: state.isValid
-//                         ? () => Navigator.of(context).pop(alarm)
-//                         : null,
-//                   ),
-//                   const SizedBox(height: 16),
-//                 ],
-//               ),
-//             );
-//           },
-//         ),
-//       ),
-//     );
-//   }
-// }
-
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:torch_light/torch_light.dart';
+import 'package:untitled3/core/constants/constants.dart';
 import '../../domain/entities/alarm_entity.dart';
 import '../../domain/entities/week_day.dart';
 import '../bloc/alarm_form/alarm_form_cubit.dart';
 import '../bloc/alarm_form/alarm_form_state.dart';
 import '../widgets/pattern_row.dart';
 
-class SetAlarmPage extends StatelessWidget {
+class SetAlarmPage extends StatefulWidget {
   final Alarm? alarm;
+
+  const SetAlarmPage({super.key, this.alarm});
+
+  @override
+  State<SetAlarmPage> createState() => _SetAlarmPageState();
+}
+
+class _SetAlarmPageState extends State<SetAlarmPage>
+    with TickerProviderStateMixin {
   late final TextEditingController labelController;
-  SetAlarmPage({super.key, required this.alarm}) {
-    labelController = TextEditingController(text: alarm?.label ?? '');
+  late final AnimationController _slideController;
+  late final AnimationController _fadeController;
+  late final Animation<Offset> _slideAnimation;
+  late final Animation<double> _fadeAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    labelController = TextEditingController(text: widget.alarm?.label ?? '');
+
+    // Animation controllers
+    _slideController = AnimationController(
+      duration: const Duration(milliseconds: 600),
+      vsync: this,
+    );
+    _fadeController = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    );
+
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0.0, 0.3),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _slideController,
+      curve: Curves.easeOutCubic,
+    ));
+
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _fadeController,
+      curve: Curves.easeIn,
+    ));
+
+    // Start animations
+    Future.delayed(const Duration(milliseconds: 100), () {
+      _slideController.forward();
+      _fadeController.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    labelController.dispose();
+    _slideController.dispose();
+    _fadeController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    // Provide the form cubit (optionally pass an initial Alarm)
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return BlocProvider(
-      create: (_) => AlarmFormCubit(initialAlarm: alarm),
-      child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.deepPurple,
-          title: const Text('Set Alarm'),
-          centerTitle: true,
+      create: (_) => AlarmFormCubit(initialAlarm: widget.alarm),
+      child: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [kPrimaryColor, kBackgroundColor],
+          ),
         ),
-        body: BlocBuilder<AlarmFormCubit, AlarmFormState>(
-          builder: (context, state) {
-            final alarm = state.alarm;
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          appBar: AppBar(
+            title: Text(
+              widget.alarm != null ? 'Edit Alarm' : 'New Alarm',
+              style: theme.textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: colorScheme.onSurface,
+                fontFamily: kFont,
+              ),
+            ),
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            centerTitle: false,
+            leading: IconButton(
+              icon: Icon(
+                Icons.close,
+                color: colorScheme.onSurface,
+                semanticLabel: 'Cancel',
+              ),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+          ),
+          body: BlocBuilder<AlarmFormCubit, AlarmFormState>(
+            builder: (context, state) {
+              final alarm = state.alarm;
 
-            return Padding(
-              padding: const EdgeInsets.all(16),
-              child: ListView(
-                // child: Column(
-                children: [
-                  // ─── Time Picker ─────────────────────────────────────────────
-                  Card(
-                    elevation: 4,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
-                    color: Colors.deepPurple.shade100,
-                    child: ListTile(
-                      title: Text(
-                        // use intl DateFormat
-                        TimeOfDay.fromDateTime(alarm.time)
-                            .format(context),
-                        style: const TextStyle(
-                            fontSize: 32, fontWeight: FontWeight.bold),
-                      ),
-                      trailing:
-                      const Icon(Icons.access_time, color: Colors.white),
-                      onTap: () async {
-                        final picked = await showTimePicker(
-                          context: context,
-                          initialTime:
-                          TimeOfDay.fromDateTime(alarm.time),
-                        );
-                        if (picked != null) {
-                          // reconstruct DateTime with picked hour/minute
-                          final now = DateTime.now();
-                          final newTime = DateTime(
-                            now.year,
-                            now.month,
-                            now.day,
-                            picked.hour,
-                            picked.minute,
-                          );
-                          context
-                              .read<AlarmFormCubit>()
-                              .updateTime(newTime);
-                        }
-                      },
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // ─── Repeat Days ────────────────────────────────────────────
-                  Card(
-                    elevation: 6,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                    clipBehavior: Clip.antiAlias,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [Colors.deepPurple.shade50, Colors.deepPurple.shade100],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                      ),
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        children: [
-                          // Header
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
+              return FadeTransition(
+                opacity: _fadeAnimation,
+                child: SlideTransition(
+                  position: _slideAnimation,
+                  child: SafeArea(
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: ListView(
+                            padding: const EdgeInsets.all(20),
                             children: [
-                              const Icon(Icons.repeat, color: Colors.deepPurple),
-                              const SizedBox(width: 8),
-                              Text(
-                                'Repeat Days',
-                                style: TextStyle(
-                                  color: Colors.deepPurple.shade800,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
+                              // Time Picker Section
+                              _buildTimePickerSection(context, alarm, colorScheme, theme),
+                              const SizedBox(height: 24),
+
+                              // Label Section
+                              _buildLabelSection(context, state, colorScheme, theme),
+                              const SizedBox(height: 24),
+
+                              // Repeat Days Section
+                              _buildRepeatDaysSection(context, alarm, colorScheme, theme),
+                              const SizedBox(height: 24),
+
+                              // Alarm Pattern Section
+                              _buildAlarmPatternSection(context, state, colorScheme, theme),
+                              const SizedBox(height: 24),
+
+                              // Settings Section
+                              _buildSettingsSection(context, state, colorScheme, theme),
+                              const SizedBox(height: 32),
                             ],
                           ),
-                          const SizedBox(height: 12),
-
-                          // Choice chips
-                          Wrap(
-                            spacing: 12,
-                            runSpacing: 8,
-                            alignment: WrapAlignment.center,
-                            children: WeekDay.values.map((day) {
-                              final selected = alarm.repeatDays.contains(day);
-                              return ChoiceChip(
-                                label: Text(day.shortName),
-                                selected: selected,
-                                onSelected: (_) {
-                                  final newDays = List<WeekDay>.from(alarm.repeatDays);
-                                  if (selected) newDays.remove(day);
-                                  else newDays.add(day);
-                                  context.read<AlarmFormCubit>().updateRepeat(newDays);
-                                },
-                                backgroundColor: Colors.white,
-                                selectedColor: Colors.deepPurple,
-                                labelStyle: TextStyle(
-                                  color: selected ? Colors.white : Colors.deepPurple,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                                shape: StadiumBorder(
-                                  side: BorderSide(
-                                    color: selected
-                                        ? Colors.deepPurple
-                                        : Colors.deepPurple.shade200,
-                                    width: 1.5,
-                                  ),
-                                ),
-                                elevation: 2,
-                                pressElevation: 4,
-                              );
-                            }).toList(),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 8),
-                        TextField(
-                          controller: labelController,
-                          maxLength: 50,
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: Colors.deepPurple.shade50,
-                            hintText: state.alarm.label == ""? "Alarm label" : "",
-                            counterText: "", // Hides the default counter text
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(16),
-                              borderSide: BorderSide.none,
-                            ),
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 12,
-                            ),
-                          ),
-                          style: const TextStyle(fontSize: 16),
-                          onChanged: (value) {
-                            context.read<AlarmFormCubit>().updateLabel(value);
-                          },
                         ),
+
+                        // Bottom Action Bar
+                        _buildBottomActionBar(context, state, colorScheme, theme),
                       ],
                     ),
                   ),
-
-
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 8.0),
-                    child: Text(
-                      'Alarm Pattern',
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                        letterSpacing: 1.2,
-                      ),
-                    ),
-                  ),
-
-                NumberSlider(initialValue: state.alarm.pattern, onValueChanged: (value) {
-                  context.read<AlarmFormCubit>().updatePattern(value);
-                }),
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      IconButton(
-                        icon: Icon(
-                          state.alarm.isEnabled ? Icons.toggle_on : Icons.toggle_off,
-                          size: 80,
-                          color: state.alarm.isEnabled ? Colors.deepPurple : Colors.grey,
-                        ),
-                        onPressed: () => context.read<AlarmFormCubit>().toggleEnabled(),
-                      ),
-                      // const Spacer(),
-                      ]
-                  ),
-
-
-                  // ─── Save Button ────────────────────────────────────────────
-                  ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 40, vertical: 16),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)),
-                    ),
-                    icon: const Icon(Icons.check),
-                    label: const Text('Save Alarm',
-                        style: TextStyle(fontSize: 18)),
-                    onPressed: state.isValid
-                        ? () {
-                      Navigator.of(context).pop(alarm);
-                    }
-                        : null,
-                  ),
-                  const SizedBox(height: 16),
-                ],
-              ),
-              // )
-            );
-          },
+                ),
+              );
+            },
+          ),
         ),
       ),
     );
+  }
+
+  Widget _buildTimePickerSection(
+      BuildContext context,
+      Alarm alarm,
+      ColorScheme colorScheme,
+      ThemeData theme,
+      ) {
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceVariant.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: colorScheme.outline.withOpacity(0.3),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        children: [
+          const Icon(
+            Icons.access_time_outlined,
+            size: 32,
+            color: kTextPrimary,
+          ),
+          const SizedBox(height: 16),
+          InkWell(
+            borderRadius: BorderRadius.circular(16),
+            onTap: () => _showTimePicker(context, alarm),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
+              decoration: BoxDecoration(
+                color: kSecondaryColor.withOpacity(0.0),
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: colorScheme.shadow.withOpacity(0.1),
+                    blurRadius: 1,
+                    offset: const Offset(0, 0),
+                  ),
+                ],
+              ),
+              child: Text(
+                TimeOfDay.fromDateTime(alarm.time).format(context),
+                style: theme.textTheme.displayMedium?.copyWith(
+                  fontWeight: FontWeight.w300,
+                  color: kTextPrimary,
+                  fontFamily: GoogleFonts.rubik().fontFamily,
+                  fontSize: 55
+                ),
+                semanticsLabel: 'Alarm time ${TimeOfDay.fromDateTime(alarm.time).format(context)}',
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Tap to change time',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: colorScheme.onSurface.withOpacity(0.6),
+              fontFamily: kFont,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLabelSection(
+      BuildContext context,
+      AlarmFormState state,
+      ColorScheme colorScheme,
+      ThemeData theme,
+      ) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceVariant.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: colorScheme.outline.withOpacity(0.3),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.label_outline,
+                color: kPrimaryColor,
+                size: 20,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Alarm Label',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: colorScheme.onSurface,
+                  fontFamily: kFont,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            controller: labelController,
+            maxLength: 50,
+            decoration: InputDecoration(
+              hintText: 'Enter alarm name (optional)',
+              filled: true,
+              fillColor: kSecondaryColor.withOpacity(0.8),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide.none,
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide(
+                  color: colorScheme.outline.withOpacity(0.2),
+                  width: 1,
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide(
+                  color: kPrimaryColor,
+                  width: 2,
+                ),
+              ),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 16,
+              ),
+              counterText: '',
+              suffixIcon: labelController.text.isNotEmpty
+                  ? IconButton(
+                icon: Icon(
+                  Icons.clear,
+                  color: colorScheme.onSurface.withOpacity(0.6),
+                ),
+                onPressed: () {
+                  labelController.clear();
+                  context.read<AlarmFormCubit>().updateLabel('');
+                },
+              )
+                  : null,
+            ),
+            style: theme.textTheme.bodyLarge?.copyWith(
+              fontFamily: kFont,
+              color: kTextPrimary,
+            ),
+            onChanged: (value) {
+              context.read<AlarmFormCubit>().updateLabel(value);
+              setState(() {}); // Rebuild to show/hide clear button
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRepeatDaysSection(
+      BuildContext context,
+      Alarm alarm,
+      ColorScheme colorScheme,
+      ThemeData theme,
+      ) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceVariant.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: colorScheme.outline.withOpacity(0.3),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.repeat,
+                color: kPrimaryColor,
+                size: 20,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Repeat',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: colorScheme.onSurface,
+                  fontFamily: kFont,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: WeekDay.values.map((day) {
+              final selected = alarm.repeatDays.contains(day);
+              return FilterChip(
+                label: Text(
+                  day.shortName,
+                  style: TextStyle(
+                    color: selected
+                        ? kSecondaryColor
+                        : colorScheme.onSurface,
+                    fontWeight: FontWeight.w500,
+                    fontFamily: kFont,
+                  ),
+                ),
+                selected: selected,
+                onSelected: (_) => _toggleRepeatDay(context, alarm, day),
+                backgroundColor: kSecondaryColor.withOpacity(0.8),
+                selectedColor: kPrimaryColor,
+                checkmarkColor: kSecondaryColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                  side: BorderSide(
+                    color: selected
+                        ? kPrimaryColor
+                        : colorScheme.outline.withOpacity(0.5),
+                    width: 1,
+                  ),
+                ),
+                elevation: selected ? 2 : 0,
+                pressElevation: 4,
+                materialTapTargetSize: MaterialTapTargetSize.padded,
+                visualDensity: VisualDensity.comfortable,
+              );
+            }).toList(),
+          ),
+          if (alarm.repeatDays.isEmpty) ...[
+            const SizedBox(height: 8),
+            Text(
+              'Select days to repeat this alarm',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurface.withOpacity(0.6),
+                fontFamily: kFont,
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAlarmPatternSection(
+      BuildContext context,
+      AlarmFormState state,
+      ColorScheme colorScheme,
+      ThemeData theme,
+      ) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceVariant.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: colorScheme.outline.withOpacity(0.3),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.graphic_eq,
+                color: kPrimaryColor,
+                size: 20,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Alarm Pattern',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: colorScheme.onSurface,
+                  fontFamily: kFont,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          NumberSlider(
+            initialValue: state.alarm.pattern,
+            onValueChanged: (value) {
+              context.read<AlarmFormCubit>().updatePattern(value);
+              // Haptic feedback
+              HapticFeedback.selectionClick();
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSettingsSection(
+      BuildContext context,
+      AlarmFormState state,
+      ColorScheme colorScheme,
+      ThemeData theme,
+      ) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceVariant.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: colorScheme.outline.withOpacity(0.3),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.settings_outlined,
+                color: kPrimaryColor,
+                size: 20,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Settings',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: colorScheme.onSurface,
+                  fontFamily: kFont,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          SwitchListTile.adaptive(
+            title: Text(
+              'Enable Alarm',
+              style: theme.textTheme.bodyLarge?.copyWith(
+                fontWeight: FontWeight.w500,
+                fontFamily: kFont,
+              ),
+            ),
+            subtitle: Text(
+              state.alarm.isEnabled ? 'Alarm is active' : 'Alarm is inactive',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurface.withOpacity(0.6),
+                fontFamily: kFont,
+              ),
+            ),
+            value: state.alarm.isEnabled,
+            onChanged: (value) {
+              context.read<AlarmFormCubit>().toggleEnabled();
+              HapticFeedback.lightImpact();
+            },
+            activeColor: kPrimaryColor,
+            activeTrackColor: kSecondaryColor,
+            contentPadding: EdgeInsets.zero,
+            visualDensity: VisualDensity.comfortable,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBottomActionBar(
+      BuildContext context,
+      AlarmFormState state,
+      ColorScheme colorScheme,
+      ThemeData theme,
+      ) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceVariant.withOpacity(0.2),
+        border: Border(
+          top: BorderSide(
+            color: colorScheme.outline.withOpacity(0.2),
+            width: 1,
+          ),
+        ),
+      ),
+      child: Row(
+        children: [
+          // Cancel button
+          Expanded(
+            child: OutlinedButton(
+              onPressed: () => Navigator.of(context).pop(),
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                side: BorderSide(
+                  color: colorScheme.outline.withOpacity(0.5),
+                ),
+                backgroundColor: kSecondaryColor.withOpacity(0.8),
+              ),
+              child: Text(
+                'Cancel',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  fontFamily: kFont,
+                  color: kTextPrimary,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 16),
+          // Save button
+          Expanded(
+            flex: 2,
+            child: FilledButton(
+              onPressed: state.isValid ? () => _saveAlarm(context, state.alarm) : null,
+              style: FilledButton.styleFrom(
+                backgroundColor: state.isValid ? kPrimaryColor : colorScheme.surfaceVariant,
+                disabledBackgroundColor: colorScheme.surfaceVariant,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                elevation: 2,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.check,
+                    color: state.isValid
+                        ? kSecondaryColor
+                        : colorScheme.onSurface.withOpacity(0.4),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    widget.alarm != null ? 'Update Alarm' : 'Save Alarm',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      fontFamily: kFont,
+                      color: state.isValid
+                          ? kSecondaryColor
+                          : colorScheme.onSurface.withOpacity(0.4),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showTimePicker(BuildContext context, Alarm alarm) async {
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(alarm.time),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            timePickerTheme: TimePickerThemeData(
+              backgroundColor: kSecondaryColor,
+              hourMinuteShape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              dayPeriodShape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              dialHandColor: kPrimaryColor,
+              dialBackgroundColor: kSecondaryColor.withOpacity(0.8),
+              hourMinuteColor: kSecondaryColor.withOpacity(0.8),
+              hourMinuteTextColor: kTextPrimary,
+              dayPeriodColor: kPrimaryColor,
+              dayPeriodTextColor: kSecondaryColor,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (picked != null) {
+      final now = DateTime.now();
+      final newTime = DateTime(
+        now.year,
+        now.month,
+        now.day,
+        picked.hour,
+        picked.minute,
+      );
+      context.read<AlarmFormCubit>().updateTime(newTime);
+      HapticFeedback.mediumImpact();
+    }
+  }
+
+  void _toggleRepeatDay(BuildContext context, Alarm alarm, WeekDay day) {
+    final newDays = List<WeekDay>.from(alarm.repeatDays);
+    final selected = newDays.contains(day);
+
+    if (selected) {
+      newDays.remove(day);
+    } else {
+      newDays.add(day);
+    }
+
+    context.read<AlarmFormCubit>().updateRepeat(newDays);
+    HapticFeedback.selectionClick();
+  }
+
+  void _saveAlarm(BuildContext context, Alarm alarm) {
+    Navigator.of(context).pop(alarm);
+    HapticFeedback.lightImpact();
   }
 }

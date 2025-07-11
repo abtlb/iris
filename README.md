@@ -66,3 +66,33 @@ The project follows a Clean Architecture approach, ensuring separation of concer
 ## MediaPipe Hand Tracking:
 The real-time sign language detection feature uses Google’s MediaPipe framework, which runs natively on Android for optimal performance. The native Android code processes camera frames and extracts hand landmarks using MediaPipe. These results are then sent to the Flutter side via platform channels, where they are used for gesture recognition and displayed in the app’s UI.
 
+# IRIS Portfolio License
+
+**Copyright (c) 2025 [Abdallah Abotaleb]**
+
+## TERMS AND CONDITIONS
+
+This software and associated documentation (the "Software") is made available solely for **portfolio viewing and evaluation purposes**.
+
+### PERMITTED:
+- ✅ **Viewing** the source code for educational and assessment purposes
+- ✅ **Reading** the documentation and README files
+- ✅ **Reviewing** the code architecture and implementation for evaluation purposes (e.g., by potential employers, educators, or peers)
+
+### STRICTLY PROHIBITED:
+- ❌ **Using** the Software for any purpose, commercial or non-commercial
+- ❌ **Copying** any part of the Software
+- ❌ **Modifying** or creating derivative works
+- ❌ **Distributing** the Software in any form
+- ❌ **Running** or executing the Software
+- ❌ **Incorporating** any part of the Software into other projects
+- ❌ **Reverse engineering** for implementation purposes
+
+### IMPORTANT NOTICES:
+- This is a **portfolio demonstration project** showcasing accessibility technology
+- The Software is provided "AS IS" without any warranties
+- No support or maintenance is provided
+- Violation of these terms may result in legal action
+
+### CONTACT:
+For inquiries about this project or licensing questions, please contact: ballaabotaleb@gmail.com

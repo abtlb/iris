@@ -51,5 +51,5 @@ assets/models/
 assets/private/
 .env
 *.pb
-lib/core/constants/*
 lib/core/env.dart
+/lib/core/constants/

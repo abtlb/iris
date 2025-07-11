@@ -53,3 +53,4 @@ assets/private/
 *.pb
 lib/core/env.dart
 /lib/core/constants/
+.gitignore

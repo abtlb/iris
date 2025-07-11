@@ -54,3 +54,4 @@ assets/private/
 lib/core/env.dart
 /lib/core/constants/
 .gitignore
+/lib/protos/

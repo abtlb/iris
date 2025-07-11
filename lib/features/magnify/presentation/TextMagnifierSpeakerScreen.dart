@@ -134,7 +134,7 @@ class _TextMagnifierSpeakerScreenState extends State<TextMagnifierSpeakerScreen>
                               const SizedBox(width: 16),
                               // TITLE with light color
                               Text(
-                                'Text Magnifier\n& Speaker',
+                                'Glass Magnifier',
                                 style: Styles.textStyle30.copyWith(
                                   color: kTextLight,
                                   fontWeight: FontWeight.bold,

@@ -4,7 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:untitled3/features/auth/presentation/pages/ForgotPasswordScreen.dart';
-import 'package:untitled3/features/auth/presentation/pages/home_page%20.dart';
+import 'package:untitled3/features/home/presentation/pages/home_page%20.dart';
 import 'package:untitled3/features/auth/presentation/pages/sign_in_screen.dart';
 import 'package:untitled3/features/auth/presentation/pages/sign_up_screen.dart';
 import 'package:untitled3/features/auth/presentation/pages/welcome_screen.dart';
@@ -16,7 +16,7 @@ import 'package:untitled3/features/learning/presentation/pages/learning_start_sc
 import 'package:untitled3/features/sound_detection/presentation/pages/emergency_alert_page.dart';
 import 'package:untitled3/features/sound_detection/presentation/pages/sound_monitor_page.dart';
 import 'package:untitled3/features/video_chat/presentation/widgets/HandTrackingWidget.dart';
-import 'package:untitled3/features/auth/presentation/pages/home_view.dart';
+import 'package:untitled3/features/home/presentation/pages/home_view.dart';
 import 'package:untitled3/features/search/presentation/views/search_view.dart';
 import 'package:untitled3/features/video_chat/presentation/pages/VideoChatTest.dart';
 import 'package:untitled3/features/video_home/presentation/views/chat_home.dart';
@@ -29,7 +29,7 @@ import '../../features/alarm/presentation/pages/alarm_page.dart';
 import '../../features/alarm/presentation/pages/set_alarm_page.dart';
 import '../../features/learning/presentation/pages/course_detail_page.dart';
 import '../../features/sound_detection/presentation/pages/sound_alert_page.dart';
-import '../../features/video_home/presentation/views/widgets/TextMagnifierSpeakerScreen.dart';
+import '../../features/magnify/presentation/TextMagnifierSpeakerScreen.dart';
 import '../../features/video_home/presentation/views/widgets/homView_body.dart';
 import '../transitions/page_transitions.dart';
 

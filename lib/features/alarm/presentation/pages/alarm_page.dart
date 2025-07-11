@@ -96,7 +96,7 @@ class _AlarmPageState extends State<AlarmPage> with TickerProviderStateMixin {
           backgroundColor: Colors.transparent,
           appBar: AppBar(
             title: Text(
-              'Alarms',
+              'Pulse Alarm',
               style: theme.textTheme.headlineMedium?.copyWith(
                 fontWeight: FontWeight.w600,
                 color: colorScheme.onSurface,

@@ -170,8 +170,8 @@ import 'package:untitled3/features/auth/domain/usecases/get_current_user.dart';
 import 'package:untitled3/features/auth/domain/usecases/get_user.dart';
 
 import '../../../../core/util/widgets/custom_iconButton.dart';
-import '../bloc/home/home_cubit.dart';
-import '../bloc/home/home_state.dart';
+import '../../../home/presentation/bloc/home/home_cubit.dart';
+import '../../../home/presentation/bloc/home/home_state.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key? key}) : super(key: key);
@@ -182,11 +182,11 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final List<Map<String, dynamic>> icons = [
-    {'icon': Icons.school, 'label': 'Learning', 'route': AppRoute.learningHome},
-    {'icon': Icons.zoom_in, 'label': 'Magnify', 'route': AppRoute.magnifierPath},
-    {'icon': Icons.hearing, 'label': 'Sound Detection', 'route': AppRoute.soundDetection},
-    {'icon': Icons.chat, 'label': 'Chat', 'route': AppRoute.chatHomePath},
-    {'icon': Icons.alarm, 'label': 'Alarm', 'route': AppRoute.alarmPath},
+    {'icon': Icons.school, 'label': 'Sign Learn', 'route': AppRoute.learningHome},
+    {'icon': Icons.zoom_in, 'label': 'Glass Magnifier', 'route': AppRoute.magnifierPath},
+    {'icon': Icons.hearing, 'label': 'Sound Guard', 'route': AppRoute.soundDetection},
+    {'icon': Icons.chat, 'label': 'Universal Chat', 'route': AppRoute.chatHomePath},
+    {'icon': Icons.alarm, 'label': 'Pulse Alarm', 'route': AppRoute.alarmPath},
   ];
 
   @override

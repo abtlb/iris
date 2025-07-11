@@ -32,7 +32,7 @@ class CustomAppBar extends StatelessWidget {
                 const SizedBox(width: 8),
                 // TITLE with blue color
                 Text(
-                  'Chat with \nfriends',
+                  'Universal Chat',
                   style: Styles.textStyle30.copyWith(color: Colors.blue),
                 ),
               ],

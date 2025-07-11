@@ -5,7 +5,6 @@ import 'dart:ui';
 import 'package:dio/dio.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get_it/get_it.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:untitled3/core/storage/storage.dart';
 import 'package:untitled3/core/services/local_notification_ds.dart';
 import 'package:untitled3/features/account/data/datasources/updateAccountService.dart';
@@ -14,8 +13,6 @@ import 'package:untitled3/features/account/domain/usecases/update_account.dart';
 import 'package:untitled3/features/account/domain/usecases/update_avatar.dart';
 import 'package:untitled3/features/alarm/data/%20services/alarm_callback_service.dart';
 import 'package:untitled3/features/alarm/data/%20services/alarm_notification_ds.dart';
-import 'package:untitled3/features/alarm/data/%20services/flash_service.dart';
-import 'package:untitled3/features/alarm/data/%20services/vibration_service.dart';
 import 'package:untitled3/features/alarm/data/repositories/alarm_repository_impl.dart';
 import 'package:untitled3/features/alarm/domain/repositories/alarm_repository.dart';
 import 'package:untitled3/features/auth/data/data_sources/remote/ApiService.dart';
@@ -28,7 +25,6 @@ import 'package:untitled3/features/auth/domain/usecases/get_user.dart';
 import 'package:untitled3/features/auth/domain/usecases/get_users.dart';
 import 'package:untitled3/features/auth/domain/usecases/sign_in.dart';
 import 'package:untitled3/features/auth/presentation/bloc/auth/sign_in/sign_in_bloc.dart';
-import 'package:untitled3/features/auth/presentation/bloc/remote_user/remote_user_bloc.dart';
 import 'package:untitled3/features/chat/data/data_sources/chat_source.dart';
 import 'package:untitled3/features/chat/data/repositories/chat_repository_impl.dart';
 import 'package:untitled3/features/chat/domain/entities/displayMessage.dart';
@@ -43,7 +39,6 @@ import 'package:untitled3/features/sound_detection/domain/repositories/sound_rep
 import 'package:untitled3/features/sound_detection/domain/usecases/save_sound_detection_settings.dart';
 import 'package:untitled3/features/sound_detection/domain/usecases/start_sound_classification_use_case.dart';
 import 'package:untitled3/features/sound_detection/presentation/bloc/sound_monitor_bloc.dart';
-import 'package:untitled3/features/sound_detection/presentation/bloc/sound_monitor_cubit.dart';
 import 'package:untitled3/features/video_chat/data/others/asl_detector.dart';
 import 'package:untitled3/features/video_chat/data/others/frame_observer.dart';
 import 'package:untitled3/features/video_chat/domain/usecases/enableLocalAudio.dart';
@@ -75,7 +70,6 @@ import 'features/alarm/presentation/bloc/alarm_form/alarm_form_cubit.dart';
 import 'features/alarm/presentation/bloc/alarm_list/alarm_list_cubit.dart';
 import 'features/auth/domain/usecases/sign_up.dart';
 import 'features/auth/presentation/bloc/auth/sign_up/sign_up_bloc.dart';
-import 'features/chat/data/models/message.dart';
 import 'features/chat/presentation/blocs/chat_bloc.dart';
 import 'features/search/presentation/manager/searchusers/searchusers_cubit.dart';
 import 'features/sound_detection/domain/usecases/get_sound_detection_settings.dart';
@@ -209,10 +203,6 @@ Future<void> initializeAuth() async {
 
   sl.registerSingleton<GetUsersUseCase>(
       GetUsersUseCase(sl())
-  );
-
-  sl.registerFactory<RemoteUsersBloc>(
-          () => RemoteUsersBloc(sl())
   );
 
   sl.registerSingleton<SignInUseCase>(

@@ -71,7 +71,7 @@ class HomeviewBody extends StatelessWidget {
                             const SizedBox(width: 16),
                             // TITLE with light color
                             Text(
-                              'Chat with\nfriends',
+                              'Universal Chat',
                               style: Styles.textStyle30.copyWith(
                                 color: kTextLight,
                                 fontWeight: FontWeight.bold,

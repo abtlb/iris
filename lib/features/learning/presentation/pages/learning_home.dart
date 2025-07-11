@@ -87,7 +87,7 @@ class _LearningHomeState extends State<LearningHome> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Learning Hub',
+                                    'Sign Learn',
                                     style: Styles.textStyle30.copyWith(
                                       color: kTextLight,
                                       fontWeight: FontWeight.bold,

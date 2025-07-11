@@ -40,7 +40,7 @@ class _SoundAlertPageState extends State<SoundAlertPage> with TickerProviderStat
     "Siren": false,
     "Buzzer": false,
     "Beep": false,
-    "Baby Cry": false,
+    "Baby cry": false,
   };
 
   Map<String, bool> _originalSoundTriggers = {};
@@ -170,7 +170,7 @@ class _SoundAlertPageState extends State<SoundAlertPage> with TickerProviderStat
           backgroundColor: Colors.transparent,
           appBar: AppBar(
             title: Text(
-              'Sound Alert',
+              'Sound Guard',
               style: theme.textTheme.headlineMedium?.copyWith(
                 fontWeight: FontWeight.w600,
                 color: colorScheme.onSurface,
@@ -1138,7 +1138,6 @@ class _SoundAlertPageState extends State<SoundAlertPage> with TickerProviderStat
     });
   }
 
-
   String _getSubtitle(String trigger) {
     switch (trigger) {
       case "Smoke Alarm":
@@ -1153,7 +1152,7 @@ class _SoundAlertPageState extends State<SoundAlertPage> with TickerProviderStat
         return "Recognizes buzzer sounds";
       case "Beep":
         return "Identifies electronic beeping";
-      case "Baby Cry":
+      case "Baby cry":
         return "Detects baby cry sounds";
       default:
         return "";
@@ -1174,7 +1173,7 @@ class _SoundAlertPageState extends State<SoundAlertPage> with TickerProviderStat
         return Icons.campaign;
       case "Beep":
         return Icons.sensors;
-      case "Baby Cry":
+      case "Baby cry":
         return Icons.child_care;
       default:
         return Icons.music_note;

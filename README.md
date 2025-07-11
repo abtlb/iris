@@ -20,7 +20,7 @@ An alarm feature that communicates through vision and motion instead of sound:
 - Includes other essential alarm features such as creating and editing alarms, setting alarm labels, repeat options.
 
 ## 3. [Glass Magnifier](https://www.canva.com/design/DAGsHMahygk/-_TARObFNUswTgDmMvxL7g/view?utm_content=DAGsHMahygk&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h7569556a9c#20)
-A tool designed specifically for people with speech difficulties. Write down what you want to say and Glass Magnifier will make it large and clear for you to show it to other people. You can also convert the magnified text to speech using a built-in speaker button.
+A tool designed specifically for people with speech difficulties. Write down what you want to say and Glass Magnifier will make it large and clear for you to show it to other people. You can also convert the magnified text to speech using a built-in speaker button.<br>
 <img width="250" height="744" alt="image" src="https://github.com/user-attachments/assets/95aa33d5-f3b2-485f-94ac-8689aa2133be" />
 
 

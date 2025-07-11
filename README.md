@@ -1,4 +1,6 @@
-<img width="300" height="1021" alt="icon_transparent" src="https://github.com/user-attachments/assets/8927d919-9070-45a4-9f51-e29e5e7c11d3" />
+<div align="center">
+  <img width="300" height="1021" alt="icon_transparent" src="https://github.com/user-attachments/assets/8927d919-9070-45a4-9f51-e29e5e7c11d3" />
+</div>
 
 # What is IRIS?
 IRIS is an innovative accessibility and communication app, designed to connect and empower users of all abilities. Created as my graduation project, IRIS brings inclusive, real-time connection to everyone.
